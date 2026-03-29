@@ -311,6 +311,7 @@ input,textarea,select,button{font-family:inherit;-webkit-appearance:none;appeara
       <div class="qa-btn" onclick="goTo('hoje')"><div class="qa-icon">💡</div><div class="qa-label">O que postar hoje</div></div>
       <div class="qa-btn" onclick="goTo('trilha')"><div class="qa-icon">🗺️</div><div class="qa-label">Continuar trilha</div></div>
       <div class="qa-btn" onclick="goTo('biblioteca')"><div class="qa-icon">📚</div><div class="qa-label">Biblioteca</div></div>
+      <div class="qa-btn" onclick="goTo('perfil')"><div class="qa-icon">⚙️</div><div class="qa-label">Meu perfil</div></div>
     </div>
     <div class="section-title">Pipeline de conteúdo</div>
     <div class="card" style="padding:12px">
@@ -377,13 +378,13 @@ input,textarea,select,button{font-family:inherit;-webkit-appearance:none;appeara
         <span class="mod-badge active">Em progresso</span>
       </div>
       <div class="mod-tasks">
-        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t6_autoridade')">T6 — 2 Carrosséis (Autoridade + Quem sou) →</div><span class="task-output">2 posts</span></div>
-        <div class="task-row" onclick="abrirGerador('t6_autoridade')"><div class="task-dot active">▶</div><div class="task-name">T7 — Posicionamento + Como eu consegui</div><span class="task-output">2 posts</span></div>
-        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t8_checklist')">T8 — Checklist + Post de Produto →</div><span class="task-output">2 posts</span></div>
-        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t9_passo')">T9 — Passo a passo + Reels Autoridade →</div><span class="task-output">2 posts</span></div>
-        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t10_conexao')">T10 — Conexão + Post Hype →</div><span class="task-output">2 posts</span></div>
-        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t10_conexao')">T11 — Dia da Persona →</div><span class="task-output">1 post</span></div>
-        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t12_story')">T12 — Storytelling + Stories →</div><span class="task-output">Stories</span></div>
+        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name" style="cursor:pointer" onclick="abrirGeradorComTemas('t6_autoridade')">T6 — 2 Carrosséis (Autoridade + Quem sou) →</div><span class="task-output">2 posts</span></div>
+        <div class="task-row" onclick="abrirGeradorComTemas('t6_autoridade')"><div class="task-dot active">▶</div><div class="task-name">T7 — Posicionamento + Como eu consegui</div><span class="task-output">2 posts</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGeradorComTemas('t8_checklist')">T8 — Checklist + Post de Produto →</div><span class="task-output">2 posts</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGeradorComTemas('t9_passo')">T9 — Passo a passo + Reels Autoridade →</div><span class="task-output">2 posts</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGeradorComTemas('t10_conexao')">T10 — Conexão + Post Hype →</div><span class="task-output">2 posts</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGeradorComTemas('t10_conexao')">T11 — Dia da Persona →</div><span class="task-output">1 post</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGeradorComTemas('t12_story')">T12 — Storytelling + Stories →</div><span class="task-output">Stories</span></div>
         <div class="task-row"><div class="task-dot pending">·</div><div class="task-name">T13 — 20 Ideias Topo de Funil</div><span class="task-output">Banco</span></div>
         <div class="task-row"><div class="task-dot pending">·</div><div class="task-name">T14 — 20 Ideias Meio de Funil + Lives</div><span class="task-output">Banco</span></div>
       </div>
@@ -573,6 +574,180 @@ input,textarea,select,button{font-family:inherit;-webkit-appearance:none;appeara
   <div class="bottom-nav" id="nav-gerador"></div>
 </div>
 
+
+<!-- ============================= ONBOARDING ============================= -->
+<div id="screen-onboarding" class="screen">
+  <div class="hdr">
+    <div class="logo">MDP</div>
+    <div class="hdr-right"><div class="hdr-label">Configuração inicial</div><div class="hdr-title" id="ob-titulo">Sobre você</div></div>
+  </div>
+  <div class="scroll-body" id="ob-body">
+    <!-- Progresso -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <div class="prog-bar" style="flex:1;margin-bottom:0"><div class="prog-fill" id="ob-prog" style="width:20%"></div></div>
+      <div style="font-size:11px;color:var(--taupe);font-weight:500" id="ob-step-label">Passo 1 de 5</div>
+    </div>
+
+    <!-- STEP 1: Identidade -->
+    <div id="ob-step-1">
+      <div class="card-dark" style="margin-bottom:14px">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);font-weight:600;margin-bottom:6px">Vamos configurar seu Studio</div>
+        <div style="font-size:11px;color:rgba(212,190,142,0.6);line-height:1.7">Essas informações alimentam o Segundo Cérebro Criativo. O Gemini vai usar tudo isso para gerar conteúdo com sua voz e para sua persona.</div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px">Sua identidade</div>
+        <div class="field">
+          <div class="field-label">Seu nome completo</div>
+          <input class="field-input" id="ob-nome" placeholder="Ex: Vivi Freri">
+        </div>
+        <div class="field">
+          <div class="field-label">Seu nicho ou área de atuação</div>
+          <div style="font-size:10px;color:var(--taupe);margin-bottom:5px;font-style:italic">O que você faz e para quem</div>
+          <input class="field-input" id="ob-nicho" placeholder="Ex: Presença digital para mulheres 40+">
+        </div>
+        <div class="field">
+          <div class="field-label">Seu produto ou serviço principal</div>
+          <input class="field-input" id="ob-produto" placeholder="Ex: MDP — Método Digital na Prática, 12 semanas">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field-label">Seu posicionamento em uma frase</div>
+          <div style="font-size:10px;color:var(--taupe);margin-bottom:5px;font-style:italic">A frase que define sua autoridade</div>
+          <input class="field-input" id="ob-posicionamento" placeholder="Ex: Autoridade não se inventa. Se organiza.">
+        </div>
+      </div>
+      <button class="btn-gold" onclick="obProximo(2)">Continuar →</button>
+    </div>
+
+    <!-- STEP 2: Persona -->
+    <div id="ob-step-2" style="display:none">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px">Sua persona ideal</div>
+        <div class="field">
+          <div class="field-label">Nome da sua persona</div>
+          <input class="field-input" id="ob-persona-nome" placeholder="Ex: Helena">
+        </div>
+        <div class="field">
+          <div class="field-label">Quem ela é</div>
+          <div style="font-size:10px;color:var(--taupe);margin-bottom:5px;font-style:italic">Idade, situação, contexto de vida</div>
+          <textarea class="field-textarea" id="ob-persona-quem" rows="2" placeholder="Ex: Mulher 40+, trajetória corporativa sólida, quer presença digital mas trava na hora de criar conteúdo"></textarea>
+        </div>
+        <div class="field">
+          <div class="field-label">Maior dor dela</div>
+          <textarea class="field-textarea" id="ob-persona-dor" rows="2" placeholder="Ex: Sente que tem muito a oferecer mas se sente invisível online"></textarea>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field-label">Maior desejo dela</div>
+          <textarea class="field-textarea" id="ob-persona-desejo" rows="2" placeholder="Ex: Ter autoridade reconhecida no digital sem precisar reinventar quem é"></textarea>
+        </div>
+      </div>
+      <button class="btn-gold" onclick="obProximo(3)">Continuar →</button>
+      <button class="btn-outline" onclick="obProximo(1)">← Voltar</button>
+    </div>
+
+    <!-- STEP 3: Voz e Tom -->
+    <div id="ob-step-3" style="display:none">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px">Sua voz e tom</div>
+        <div class="field">
+          <div class="field-label">Como você fala — descreva seu tom</div>
+          <div style="font-size:10px;color:var(--taupe);margin-bottom:5px;font-style:italic">Como você se comunica com sua audiência</div>
+          <textarea class="field-textarea" id="ob-voz" rows="2" placeholder="Ex: Direta, sem enrolação, coloca o dedo na dor, orienta com autoridade"></textarea>
+        </div>
+        <div class="field">
+          <div class="field-label">O que você NUNCA quer soar</div>
+          <textarea class="field-textarea" id="ob-voz-nao" rows="2" placeholder="Ex: Condescendente, motivacional vazio, clichê de marketing digital"></textarea>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field-label">Seus 3 pilares de conteúdo</div>
+          <div style="font-size:10px;color:var(--taupe);margin-bottom:5px;font-style:italic">Os temas centrais do seu conteúdo</div>
+          <textarea class="field-textarea" id="ob-pilares" rows="2" placeholder="Ex: Identidade digital · Autoridade organizada · Presença estratégica"></textarea>
+        </div>
+      </div>
+      <button class="btn-gold" onclick="obProximo(4)">Continuar →</button>
+      <button class="btn-outline" onclick="obProximo(2)">← Voltar</button>
+    </div>
+
+    <!-- STEP 4: Método e História -->
+    <div id="ob-step-4" style="display:none">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px">Seu método e história</div>
+        <div class="field">
+          <div class="field-label">Seu método ou abordagem</div>
+          <textarea class="field-textarea" id="ob-metodo" rows="2" placeholder="Ex: BASE → FOCO → VOZ — organizar identidade antes de criar conteúdo"></textarea>
+        </div>
+        <div class="field">
+          <div class="field-label">Sua história de origem</div>
+          <div style="font-size:10px;color:var(--taupe);margin-bottom:5px;font-style:italic">O que te trouxe até aqui — a virada que criou o que você faz hoje</div>
+          <textarea class="field-textarea" id="ob-historia" rows="3" placeholder="Ex: 30 anos no corporativo, saí por desalinhamento, criei o MDP para que outras mulheres não precisem passar pelo mesmo..."></textarea>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field-label">Uma prova social ou resultado real</div>
+          <textarea class="field-textarea" id="ob-prova" rows="2" placeholder="Ex: Aluna chegou sem conseguir escrever a bio e em 4 semanas tinha perfil, linha editorial e primeiros posts prontos"></textarea>
+        </div>
+      </div>
+      <button class="btn-gold" onclick="obProximo(5)">Continuar →</button>
+      <button class="btn-outline" onclick="obProximo(3)">← Voltar</button>
+    </div>
+
+    <!-- STEP 5: Revisão e Salvar -->
+    <div id="ob-step-5" style="display:none">
+      <div class="card-dark" style="margin-bottom:12px">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);font-weight:600;margin-bottom:6px">Segundo Cérebro pronto ✓</div>
+        <div style="font-size:11px;color:rgba(212,190,142,0.6);line-height:1.7">O Gemini vai usar essas informações para gerar todo o seu conteúdo com sua voz, para sua persona e alinhado com seu método.</div>
+      </div>
+      <div class="card" id="ob-resumo"></div>
+      <button class="btn-gold" onclick="salvarOnboarding()">Salvar e começar →</button>
+      <button class="btn-outline" onclick="obProximo(4)">← Editar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================= PERFIL ============================= -->
+<div id="screen-perfil" class="screen">
+  <div class="hdr">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="goTo('dashboard')" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:18px;padding:0">←</button>
+      <div class="logo">MDP</div>
+    </div>
+    <div class="hdr-right"><div class="hdr-label">Studio Criativo</div><div class="hdr-title">Meu Perfil</div></div>
+  </div>
+  <div class="scroll-body">
+    <div style="margin-bottom:14px">
+      <div class="page-title">Segundo Cérebro</div>
+      <div class="page-sub">Edite suas informações — o Gemini usa tudo isso para gerar seu conteúdo</div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-bottom:10px">Identidade</div>
+      <div class="field"><div class="field-label">Nome</div><input class="field-input" id="pf-nome"></div>
+      <div class="field"><div class="field-label">Nicho</div><input class="field-input" id="pf-nicho"></div>
+      <div class="field"><div class="field-label">Produto principal</div><input class="field-input" id="pf-produto"></div>
+      <div class="field" style="margin-bottom:0"><div class="field-label">Posicionamento</div><input class="field-input" id="pf-posicionamento"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-bottom:10px">Persona</div>
+      <div class="field"><div class="field-label">Nome da persona</div><input class="field-input" id="pf-persona-nome"></div>
+      <div class="field"><div class="field-label">Quem ela é</div><textarea class="field-textarea" id="pf-persona-quem" rows="2"></textarea></div>
+      <div class="field"><div class="field-label">Maior dor</div><textarea class="field-textarea" id="pf-persona-dor" rows="2"></textarea></div>
+      <div class="field" style="margin-bottom:0"><div class="field-label">Maior desejo</div><textarea class="field-textarea" id="pf-persona-desejo" rows="2"></textarea></div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-bottom:10px">Voz e Método</div>
+      <div class="field"><div class="field-label">Tom de voz</div><textarea class="field-textarea" id="pf-voz" rows="2"></textarea></div>
+      <div class="field"><div class="field-label">O que nunca quer soar</div><textarea class="field-textarea" id="pf-voz-nao" rows="2"></textarea></div>
+      <div class="field"><div class="field-label">Pilares de conteúdo</div><textarea class="field-textarea" id="pf-pilares" rows="2"></textarea></div>
+      <div class="field"><div class="field-label">Método</div><textarea class="field-textarea" id="pf-metodo" rows="2"></textarea></div>
+      <div class="field"><div class="field-label">História de origem</div><textarea class="field-textarea" id="pf-historia" rows="3"></textarea></div>
+      <div class="field" style="margin-bottom:0"><div class="field-label">Prova social</div><textarea class="field-textarea" id="pf-prova" rows="2"></textarea></div>
+    </div>
+
+    <button class="btn-gold" onclick="salvarPerfil()">Salvar alterações →</button>
+    <button class="btn-outline" style="color:var(--error);border-color:var(--error)" onclick="logout()">Sair da conta</button>
+  </div>
+  <div class="bottom-nav" id="nav-perfil"></div>
+</div>
 </div><!-- /app -->
 
 <script>
@@ -584,7 +759,7 @@ let currentUser = null;
 
 async function checkSession(){
   const { data:{ session } } = await supa.auth.getSession();
-  if(session){ currentUser = session.user; goTo('dashboard'); }
+  if(session){ currentUser = session.user; await verificarOnboarding(); }
 }
 
 async function loginEmail(){
@@ -597,7 +772,7 @@ async function loginEmail(){
   btn.textContent='Entrar no Studio →'; btn.disabled=false;
   if(error){ showToast('E-mail ou senha incorretos.'); return; }
   currentUser = data.user;
-  goTo('dashboard');
+  await verificarOnboarding();
 }
 
 async function cadastrarEmail(){
@@ -613,7 +788,7 @@ async function cadastrarEmail(){
   if(error){ showToast(error.message); return; }
   currentUser = data.user;
   await supa.from('profiles').upsert({ id: data.user.id, name: nome });
-  goTo('dashboard');
+  goTo('onboarding');
 }
 
 async function logout(){
@@ -639,7 +814,7 @@ function showToast(msg){
 
 // ===== GEMINI API =====
 const GEMINI_KEY = 'AIzaSyBHyjS83QRbN4Z-YwzzqOKj9pW8B7azLCk';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
 
 async function geminiGerar(prompt, contexto=''){
   const fullPrompt = contexto ? contexto + '\n\n' + prompt : prompt;
@@ -1007,6 +1182,339 @@ function buildGeradorNav(){
   });
 }
 
+
+// ===== ONBOARDING & PERFIL =====
+let obStep = 1;
+const obStepTitles = ['','Sobre você','Sua persona','Voz e tom','Método e história','Revisão'];
+
+function obProximo(step){
+  document.getElementById('ob-step-'+obStep).style.display='none';
+  obStep = step;
+  document.getElementById('ob-step-'+step).style.display='block';
+  document.getElementById('ob-titulo').textContent = obStepTitles[step];
+  document.getElementById('ob-step-label').textContent = 'Passo '+step+' de 5';
+  document.getElementById('ob-prog').style.width = (step*20)+'%';
+  if(step===5) buildObResumo();
+  document.getElementById('ob-body').scrollTop=0;
+}
+
+function buildObResumo(){
+  const dados = coletarDadosOb();
+  const resumo = document.getElementById('ob-resumo');
+  resumo.innerHTML = Object.entries({
+    'Nome': dados.nome,
+    'Nicho': dados.nicho,
+    'Produto': dados.produto,
+    'Posicionamento': dados.posicionamento,
+    'Persona': dados.persona_nome + ' — ' + dados.persona_quem,
+    'Dor da persona': dados.persona_dor,
+    'Tom de voz': dados.voz,
+    'Pilares': dados.pilares,
+    'Método': dados.metodo,
+  }).map(([k,v])=>`
+    <div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid rgba(24,43,59,0.05)">
+      <div style="font-size:10px;color:var(--taupe);font-weight:600;min-width:90px;flex-shrink:0">${k}</div>
+      <div style="font-size:12px;color:var(--navy);line-height:1.5">${v||'—'}</div>
+    </div>
+  `).join('');
+}
+
+function coletarDadosOb(){
+  return {
+    nome: document.getElementById('ob-nome').value.trim(),
+    nicho: document.getElementById('ob-nicho').value.trim(),
+    produto: document.getElementById('ob-produto').value.trim(),
+    posicionamento: document.getElementById('ob-posicionamento').value.trim(),
+    persona_nome: document.getElementById('ob-persona-nome').value.trim(),
+    persona_quem: document.getElementById('ob-persona-quem').value.trim(),
+    persona_dor: document.getElementById('ob-persona-dor').value.trim(),
+    persona_desejo: document.getElementById('ob-persona-desejo').value.trim(),
+    voz: document.getElementById('ob-voz').value.trim(),
+    voz_nao: document.getElementById('ob-voz-nao').value.trim(),
+    pilares: document.getElementById('ob-pilares').value.trim(),
+    metodo: document.getElementById('ob-metodo').value.trim(),
+    historia: document.getElementById('ob-historia').value.trim(),
+    prova: document.getElementById('ob-prova').value.trim(),
+  };
+}
+
+async function salvarOnboarding(){
+  if(!currentUser){ showToast('Faça login primeiro.'); return; }
+  const dados = coletarDadosOb();
+  const btn = document.querySelector('#ob-step-5 .btn-gold');
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+
+  // Salvar no Supabase
+  const campos = Object.entries(dados).map(([k,v])=>({
+    user_id: currentUser.id, category: 'cerebro', question: k, answer: v
+  }));
+  
+  // Deletar antigos e inserir novos
+  await supa.from('identity_brain').delete().eq('user_id', currentUser.id);
+  const { error } = await supa.from('identity_brain').insert(campos);
+  
+  if(error){ showToast('Erro ao salvar. Tente novamente.'); btn.textContent='Salvar e começar →'; btn.disabled=false; return; }
+  
+  // Atualizar perfil
+  await supa.from('profiles').upsert({ id: currentUser.id, name: dados.nome, onboarding_complete: true });
+  
+  // Atualizar Segundo Cérebro em memória
+  atualizarCerebro(dados);
+  showToast('✓ Segundo Cérebro salvo!');
+  goTo('dashboard');
+}
+
+function atualizarCerebro(dados){
+  segundoCerebro = {
+    nome: dados.nome || segundoCerebro.nome,
+    nicho: dados.nicho || segundoCerebro.nicho,
+    persona: (dados.persona_nome||'Helena') + ' — ' + (dados.persona_quem||''),
+    produto: dados.produto || segundoCerebro.produto,
+    voz: dados.voz || segundoCerebro.voz,
+    pilares: dados.pilares || segundoCerebro.pilares,
+    posicionamento: dados.posicionamento || segundoCerebro.posicionamento,
+    metodologia: dados.metodo || segundoCerebro.metodologia,
+    historia: dados.historia || '',
+    prova: dados.prova || '',
+    persona_dor: dados.persona_dor || '',
+    persona_desejo: dados.persona_desejo || '',
+    voz_nao: dados.voz_nao || '',
+  };
+}
+
+async function carregarCerebro(){
+  if(!currentUser) return;
+  const { data } = await supa.from('identity_brain').select('*').eq('user_id', currentUser.id);
+  if(!data || !data.length) return;
+  const map = {};
+  data.forEach(r=>{ map[r.question] = r.answer; });
+  atualizarCerebro(map);
+  
+  // Preencher campos do perfil
+  preencherCamposPerfil(map);
+  
+  // Preencher campos do onboarding com dados existentes
+  preencherCamposOb(map);
+}
+
+function preencherCamposOb(dados){
+  const campos = ['nome','nicho','produto','posicionamento','persona-nome','persona-quem','persona-dor','persona-desejo','voz','voz-nao','pilares','metodo','historia','prova'];
+  campos.forEach(c=>{
+    const el = document.getElementById('ob-'+c);
+    if(el && dados[c.replace('-','_')]) el.value = dados[c.replace('-','_')];
+  });
+}
+
+function preencherCamposPerfil(dados){
+  const mapa = {
+    'pf-nome':'nome','pf-nicho':'nicho','pf-produto':'produto','pf-posicionamento':'posicionamento',
+    'pf-persona-nome':'persona_nome','pf-persona-quem':'persona_quem','pf-persona-dor':'persona_dor',
+    'pf-persona-desejo':'persona_desejo','pf-voz':'voz','pf-voz-nao':'voz_nao',
+    'pf-pilares':'pilares','pf-metodo':'metodo','pf-historia':'historia','pf-prova':'prova'
+  };
+  Object.entries(mapa).forEach(([elId, key])=>{
+    const el = document.getElementById(elId);
+    if(el && dados[key]) el.value = dados[key];
+  });
+}
+
+async function salvarPerfil(){
+  if(!currentUser){ showToast('Faça login primeiro.'); return; }
+  const btn = document.querySelector('#screen-perfil .btn-gold');
+  btn.textContent = 'Salvando...'; btn.disabled = true;
+
+  const mapa = {
+    'pf-nome':'nome','pf-nicho':'nicho','pf-produto':'produto','pf-posicionamento':'posicionamento',
+    'pf-persona-nome':'persona_nome','pf-persona-quem':'persona_quem','pf-persona-dor':'persona_dor',
+    'pf-persona-desejo':'persona_desejo','pf-voz':'voz','pf-voz-nao':'voz_nao',
+    'pf-pilares':'pilares','pf-metodo':'metodo','pf-historia':'historia','pf-prova':'prova'
+  };
+
+  const dados = {};
+  Object.entries(mapa).forEach(([elId, key])=>{
+    const el = document.getElementById(elId);
+    if(el) dados[key] = el.value.trim();
+  });
+
+  const campos = Object.entries(dados).map(([k,v])=>({
+    user_id: currentUser.id, category: 'cerebro', question: k, answer: v
+  }));
+
+  await supa.from('identity_brain').delete().eq('user_id', currentUser.id);
+  const { error } = await supa.from('identity_brain').insert(campos);
+
+  btn.textContent = 'Salvar alterações →'; btn.disabled = false;
+  if(error){ showToast('Erro ao salvar.'); return; }
+
+  atualizarCerebro(dados);
+  await supa.from('profiles').upsert({ id: currentUser.id, name: dados.nome });
+  showToast('✓ Perfil atualizado!');
+}
+
+// Verificar se precisa de onboarding ao entrar
+async function verificarOnboarding(){
+  if(!currentUser) return;
+  await carregarCerebro();
+  const { data } = await supa.from('profiles').select('onboarding_complete, name').eq('id', currentUser.id).single();
+  if(!data || !data.onboarding_complete){
+    goTo('onboarding');
+  } else {
+    // Atualizar nome no dashboard
+    if(data.name){
+      const el = document.querySelector('.welcome-name');
+      if(el) el.textContent = 'Olá, ' + data.name.split(' ')[0] + ' 👋';
+    }
+    goTo('dashboard');
+  }
+}
+
+// Navs adicionais
+function buildPerfilNav(){
+  const navEl = document.getElementById('nav-perfil');
+  if(!navEl) return;
+  NAV_ITEMS.forEach(n=>{
+    const btn = document.createElement('button');
+    btn.className='nav-btn';
+    btn.onclick=()=>goTo(n.id);
+    const shape = n.icon==='sq'?'<div class="nav-sq"></div>':'<div class="nav-dot"></div>';
+    btn.innerHTML=`<div class="nav-icon">${shape}</div><div class="nav-label">${n.label}</div>`;
+    navEl.appendChild(btn);
+  });
+}
+
+
+// ===== SUGESTÃO DE TEMAS =====
+async function sugerirTemas(tarefaKey){
+  const cfg = TAREFAS_CONFIG[tarefaKey];
+  if(!cfg) return;
+  
+  const ctx = getContextoCerebro();
+  const prompt = `Sugira 3 temas específicos e personalizados para um post do tipo "${cfg.titulo}" para ${segundoCerebro.nome}.
+Nicho: ${segundoCerebro.nicho}
+Persona: ${segundoCerebro.persona}
+Produto: ${segundoCerebro.produto}
+Pilares: ${segundoCerebro.pilares}
+História: ${segundoCerebro.historia || 'não informada'}
+
+Retorne APENAS 3 temas, um por linha, sem numeração, sem explicação. Cada tema deve ser específico, não genérico.`;
+
+  const res = await geminiGerar(prompt, '');
+  if(!res) return null;
+  return res.split('\n').filter(t=>t.trim()).slice(0,3);
+}
+
+async function abrirGeradorComTemas(tarefaKey){
+  const cfg = TAREFAS_CONFIG[tarefaKey];
+  if(!cfg){ showToast('Tarefa não encontrada.'); return; }
+  
+  geradorConfig = { ...cfg, formato: cfg.formatos[0] };
+  
+  // Configura header
+  document.getElementById('gen-modulo').textContent = cfg.modulo;
+  document.getElementById('gen-titulo').textContent = cfg.titulo;
+  
+  // Tags Segundo Cérebro
+  const tags = document.getElementById('gen-cerebro-tags');
+  tags.innerHTML = ['Segundo Cérebro ativo', segundoCerebro.nicho.split(' ').slice(0,3).join(' '), segundoCerebro.posicionamento.split('.')[0]].map(t=>
+    `<span style="font-size:10px;padding:2px 9px;border-radius:50px;background:rgba(212,190,142,0.1);color:var(--gold);font-weight:500">${t}</span>`
+  ).join('');
+
+  // Formatos
+  const fmtGrid = document.getElementById('gen-fmt-grid');
+  fmtGrid.innerHTML = '';
+  const fmtIcons = {'Carrossel':'🎠','Reels':'🎬','Estático':'🖼️','Vídeo direto':'📹','Stories':'📱'};
+  cfg.formatos.forEach((f,i)=>{
+    const div = document.createElement('div');
+    div.className='fmt-opt'+(i===0?' on':'');
+    div.onclick=()=>{ document.querySelectorAll('#gen-fmt-grid .fmt-opt').forEach(x=>x.classList.remove('on')); div.classList.add('on'); geradorConfig.formato=f; };
+    div.innerHTML=`<div class="fmt-icon">${fmtIcons[f]||'📄'}</div><div class="fmt-name">${f}</div>`;
+    fmtGrid.appendChild(div);
+  });
+
+  // Aviso
+  const aviso = document.getElementById('gen-aviso');
+  if(cfg.aviso){ aviso.style.display='block'; document.getElementById('gen-aviso-title').textContent=cfg.avisoTitle||''; document.getElementById('gen-aviso-text').textContent=cfg.avisoText||''; }
+  else aviso.style.display='none';
+
+  // Reset
+  document.getElementById('gen-resultado').style.display='none';
+  document.getElementById('gen-legenda-box').classList.remove('show');
+  document.getElementById('gen-btn-gerar').style.display='block';
+  document.getElementById('gen-btn-gerar').textContent='Gerar com Gemini →';
+  document.getElementById('gen-btn-gerar').disabled=false;
+
+  // Mostrar seletor de temas
+  const temaWrap = document.getElementById('gen-tema-wrap');
+  temaWrap.style.display='block';
+  document.getElementById('gen-tema-label').textContent='Tema sugerido pelo Gemini';
+  document.getElementById('gen-tema-hint').textContent='Sugerindo temas baseados no seu perfil...';
+  document.getElementById('gen-tema-input').value='';
+  document.getElementById('gen-tema-input').placeholder='Carregando sugestões...';
+  document.getElementById('gen-tema-input').disabled=true;
+
+  goTo('gerador');
+
+  // Buscar temas em paralelo
+  const temas = await sugerirTemas(tarefaKey);
+  if(temas && temas.length){
+    renderTemasSugeridos(temas);
+  } else {
+    document.getElementById('gen-tema-hint').textContent='Digite o tema que quer abordar.';
+    document.getElementById('gen-tema-input').disabled=false;
+    document.getElementById('gen-tema-input').placeholder='Descreva o tema...';
+  }
+}
+
+function renderTemasSugeridos(temas){
+  const wrap = document.getElementById('gen-tema-wrap');
+  const hint = document.getElementById('gen-tema-hint');
+  hint.textContent='Escolha um tema ou escreva o seu:';
+  
+  // Remover chips antigos
+  document.querySelectorAll('.tema-chip').forEach(c=>c.remove());
+  
+  const chipsDiv = document.createElement('div');
+  chipsDiv.style.cssText='display:flex;flex-direction:column;gap:6px;margin-bottom:10px';
+  temas.forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className='tema-chip';
+    chip.style.cssText='background:var(--surface);border:1.5px solid rgba(24,43,59,0.1);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:12px;color:var(--navy);transition:all .2s;line-height:1.4';
+    chip.textContent=t;
+    chip.onclick=()=>{
+      document.querySelectorAll('.tema-chip').forEach(c=>c.style.borderColor='rgba(24,43,59,0.1)');
+      chip.style.borderColor='var(--gold)';
+      chip.style.background='rgba(212,190,142,0.06)';
+      document.getElementById('gen-tema-input').value=t;
+    };
+    chipsDiv.appendChild(chip);
+  });
+  
+  const input = document.getElementById('gen-tema-input');
+  input.disabled=false;
+  input.placeholder='Ou escreva seu próprio tema...';
+  input.parentNode.insertBefore(chipsDiv, input);
+
+  // Botão para novas sugestões
+  let btnNovo = document.getElementById('btn-novos-temas');
+  if(!btnNovo){
+    btnNovo = document.createElement('button');
+    btnNovo.id='btn-novos-temas';
+    btnNovo.className='btn-outline';
+    btnNovo.style.cssText='margin-top:6px;font-size:11px;padding:8px';
+    btnNovo.textContent='Sugerir outros temas';
+    btnNovo.onclick=async()=>{
+      document.querySelectorAll('.tema-chip').forEach(c=>c.remove());
+      btnNovo.textContent='Buscando temas...';
+      btnNovo.disabled=true;
+      const novos = await sugerirTemas(geradorConfig.tipo);
+      if(novos) renderTemasSugeridos(novos);
+      btnNovo.textContent='Sugerir outros temas';
+      btnNovo.disabled=false;
+    };
+    wrap.appendChild(btnNovo);
+  }
+}
+
 // ===== NAVEGAÇÃO =====
 const NAV_ITEMS = [
   {id:'dashboard', icon:'dot', label:'Início'},
@@ -1014,6 +1522,7 @@ const NAV_ITEMS = [
   {id:'producao',  icon:'sq',  label:'Produção'},
   {id:'biblioteca',icon:'dot', label:'Biblioteca'},
   {id:'hoje',      icon:'dot', label:'Hoje'},
+  {id:'perfil',    icon:'dot', label:'Perfil'},
 ];
 
 function buildNavs(){
@@ -1144,6 +1653,7 @@ buildNavs();
 buildBiblioteca();
 checkSession();
 buildGeradorNav();
+buildPerfilNav();
 </script>
 </body>
 </html>
