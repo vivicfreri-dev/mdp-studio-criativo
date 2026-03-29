@@ -291,7 +291,7 @@ input,textarea,select,button{font-family:inherit;-webkit-appearance:none;appeara
   </div>
   <div class="scroll-body">
     <div class="welcome-banner">
-      <div class="welcome-name">Olá, Vivi 👋</div>
+      <div style="display:flex;align-items:center;justify-content:space-between"><div class="welcome-name">Olá, Vivi 👋</div><button onclick="goTo('perfil')" style="background:rgba(212,190,142,0.12);border:1px solid rgba(212,190,142,0.2);color:var(--gold);border-radius:50px;padding:5px 12px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">⚙️ Perfil</button></div>
       <div class="welcome-idea-label">💡 Ideia para hoje</div>
       <div class="welcome-idea">"Você tem 30 anos de experiência que valem ouro. Que tal compartilhar uma decisão difícil que tomou na carreira — e o que ela te ensinou sobre autoridade?"</div>
     </div>
@@ -358,17 +358,17 @@ input,textarea,select,button{font-family:inherit;-webkit-appearance:none;appeara
       <div class="page-sub">Execute cada tarefa — cada uma entrega um conteúdo pronto para publicar</div>
     </div>
     <div class="mod-card">
-      <div class="mod-header" onclick="toggleMod(this)">
+      <div class="mod-header" onclick="toggleMod(this)" style="cursor:pointer">
         <div class="mod-node done">✓</div>
         <div class="mod-info"><div class="mod-title">Módulo 1 — Firmar as Bases</div><div class="mod-sub">Bio · Linha Editorial · Segundo Cérebro · Interesses · Autopercepção</div></div>
         <span class="mod-badge done">Concluído</span>
       </div>
       <div class="mod-tasks open">
-        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T1 — Bio Magnética no Instagram</div><span class="task-output">Bio pronta</span></div>
-        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T2 — Linha Editorial</div><span class="task-output">Editorial</span></div>
-        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T3 — Segundo Cérebro Criativo</div><span class="task-output">Perfil IA</span></div>
-        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T4 — Lista de Interesses</div><span class="task-output">Lista</span></div>
-        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T5 — Autopercepção e Audiência</div><span class="task-output">Diagnóstico</span></div>
+        <div class="task-row" onclick="goTo('perfil')" style="cursor:pointer"><div class="task-dot done">✓</div><div class="task-name">T1 — Bio Magnética no Instagram</div><span class="task-output">Bio pronta</span></div>
+        <div class="task-row" onclick="goTo('perfil')" style="cursor:pointer"><div class="task-dot done">✓</div><div class="task-name">T2 — Linha Editorial</div><span class="task-output">Editorial</span></div>
+        <div class="task-row" onclick="goTo('perfil')" style="cursor:pointer"><div class="task-dot done">✓</div><div class="task-name">T3 — Segundo Cérebro Criativo</div><span class="task-output">Perfil IA</span></div>
+        <div class="task-row" onclick="goTo('perfil')" style="cursor:pointer"><div class="task-dot done">✓</div><div class="task-name">T4 — Lista de Interesses</div><span class="task-output">Lista</span></div>
+        <div class="task-row" onclick="goTo('perfil')" style="cursor:pointer"><div class="task-dot done">✓</div><div class="task-name">T5 — Autopercepção e Audiência</div><span class="task-output">Diagnóstico</span></div>
       </div>
     </div>
     <div class="mod-card">
@@ -714,7 +714,7 @@ input,textarea,select,button{font-family:inherit;-webkit-appearance:none;appeara
   <div class="scroll-body">
     <div style="margin-bottom:14px">
       <div class="page-title">Segundo Cérebro</div>
-      <div class="page-sub">Edite suas informações — o Gemini usa tudo isso para gerar seu conteúdo</div>
+      <div class="page-sub">Edite qualquer campo e salve — o Gemini usa tudo para gerar seu conteúdo</div>
     </div>
 
     <div class="card">
@@ -814,28 +814,39 @@ function showToast(msg){
 
 // ===== GEMINI API =====
 const GEMINI_KEY = 'AIzaSyBHyjS83QRbN4Z-YwzzqOKj9pW8B7azLCk';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_KEY}`;
 
 async function geminiGerar(prompt, contexto=''){
   const fullPrompt = contexto ? contexto + '\n\n' + prompt : prompt;
-  try {
-    const res = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: fullPrompt }] }],
-        generationConfig: { temperature: 0.85, maxOutputTokens: 2048 }
-      })
-    });
-    const data = await res.json();
-    if(data.candidates && data.candidates[0]){
-      return data.candidates[0].content.parts[0].text;
+  const models = [
+    'gemini-2.0-flash-lite',
+    'gemini-1.5-flash-latest',
+    'gemini-1.5-flash',
+    'gemini-pro'
+  ];
+  
+  for(const model of models){
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: fullPrompt }] }],
+          generationConfig: { temperature: 0.85, maxOutputTokens: 2048 }
+        })
+      });
+      const data = await res.json();
+      if(data.candidates && data.candidates[0]){
+        return data.candidates[0].content.parts[0].text;
+      }
+      console.warn('Model', model, 'failed, trying next...');
+    } catch(e) {
+      console.warn('Model', model, 'error:', e);
     }
-    return null;
-  } catch(e) {
-    console.error('Gemini error:', e);
-    return null;
   }
+  console.error('All Gemini models failed');
+  return null;
 }
 
 // Contexto base do Segundo Cérebro (lido do Supabase quando disponível)
