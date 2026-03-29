@@ -714,37 +714,115 @@ input,textarea,select,button{font-family:inherit;-webkit-appearance:none;appeara
   <div class="scroll-body">
     <div style="margin-bottom:14px">
       <div class="page-title">Segundo Cérebro</div>
-      <div class="page-sub">Edite qualquer campo e salve — o Gemini usa tudo para gerar seu conteúdo</div>
+      <div class="page-sub">O Gemini lê tudo isso para gerar seu conteúdo com sua voz e para sua persona</div>
+    </div>
+
+    <div class="card-gold" style="margin-bottom:14px">
+      <div style="font-size:11px;color:var(--navy);line-height:1.7">💡 <strong>Como funciona:</strong> quanto mais completo, melhor o conteúdo gerado. O Gemini usa essas informações para escrever com a sua voz, falar com a sua persona e conectar com o seu método.</div>
     </div>
 
     <div class="card">
-      <div class="section-title" style="margin-bottom:10px">Identidade</div>
-      <div class="field"><div class="field-label">Nome</div><input class="field-input" id="pf-nome"></div>
-      <div class="field"><div class="field-label">Nicho</div><input class="field-input" id="pf-nicho"></div>
-      <div class="field"><div class="field-label">Produto principal</div><input class="field-input" id="pf-produto"></div>
-      <div class="field" style="margin-bottom:0"><div class="field-label">Posicionamento</div><input class="field-input" id="pf-posicionamento"></div>
+      <div class="section-title" style="margin-bottom:12px">Sua identidade</div>
+
+      <div class="field">
+        <div class="field-label">Seu nome</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">Como você quer ser chamada nos conteúdos</div>
+        <input class="field-input" id="pf-nome" placeholder="Ex: Vivi Freri">
+      </div>
+
+      <div class="field">
+        <div class="field-label">Seu nicho</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">O que você faz e para quem — essa frase orienta todo o conteúdo gerado</div>
+        <input class="field-input" id="pf-nicho" placeholder="Ex: Presença digital e autoridade para mulheres 40+">
+      </div>
+
+      <div class="field">
+        <div class="field-label">Seu produto ou serviço principal</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">Nome, formato e duração — aparece nos posts de produto e CTAs</div>
+        <input class="field-input" id="pf-produto" placeholder="Ex: MDP — Método Digital na Prática, mentoria em grupo de 12 semanas">
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">Seu posicionamento em uma frase</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">A frase que define sua autoridade — aparece em fechamentos e CTAs</div>
+        <input class="field-input" id="pf-posicionamento" placeholder="Ex: Autoridade não se inventa. Se organiza.">
+      </div>
     </div>
 
     <div class="card">
-      <div class="section-title" style="margin-bottom:10px">Persona</div>
-      <div class="field"><div class="field-label">Nome da persona</div><input class="field-input" id="pf-persona-nome"></div>
-      <div class="field"><div class="field-label">Quem ela é</div><textarea class="field-textarea" id="pf-persona-quem" rows="2"></textarea></div>
-      <div class="field"><div class="field-label">Maior dor</div><textarea class="field-textarea" id="pf-persona-dor" rows="2"></textarea></div>
-      <div class="field" style="margin-bottom:0"><div class="field-label">Maior desejo</div><textarea class="field-textarea" id="pf-persona-desejo" rows="2"></textarea></div>
+      <div class="section-title" style="margin-bottom:12px">Sua persona ideal</div>
+
+      <div class="field">
+        <div class="field-label">Nome da sua persona</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">O nome fictício que representa sua cliente ideal</div>
+        <input class="field-input" id="pf-persona-nome" placeholder="Ex: Helena">
+      </div>
+
+      <div class="field">
+        <div class="field-label">Quem ela é</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">Idade, situação de vida, contexto profissional — quanto mais específica, melhor</div>
+        <textarea class="field-textarea" id="pf-persona-quem" rows="2" placeholder="Ex: Mulher 40+, trajetória corporativa sólida, quer presença digital mas trava na hora de criar conteúdo"></textarea>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Maior dor dela</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">O que ela sente que ainda não está resolvido — base dos ganchos e headlines</div>
+        <textarea class="field-textarea" id="pf-persona-dor" rows="2" placeholder="Ex: Sente que tem muito a oferecer mas se sente invisível online — aparece, mas não conecta"></textarea>
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">Maior desejo dela</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">O que ela quer conquistar — base das promessas e transformações dos posts</div>
+        <textarea class="field-textarea" id="pf-persona-desejo" rows="2" placeholder="Ex: Ter autoridade reconhecida no digital sem precisar reinventar quem é"></textarea>
+      </div>
     </div>
 
     <div class="card">
-      <div class="section-title" style="margin-bottom:10px">Voz e Método</div>
-      <div class="field"><div class="field-label">Tom de voz</div><textarea class="field-textarea" id="pf-voz" rows="2"></textarea></div>
-      <div class="field"><div class="field-label">O que nunca quer soar</div><textarea class="field-textarea" id="pf-voz-nao" rows="2"></textarea></div>
-      <div class="field"><div class="field-label">Pilares de conteúdo</div><textarea class="field-textarea" id="pf-pilares" rows="2"></textarea></div>
-      <div class="field"><div class="field-label">Método</div><textarea class="field-textarea" id="pf-metodo" rows="2"></textarea></div>
-      <div class="field"><div class="field-label">História de origem</div><textarea class="field-textarea" id="pf-historia" rows="3"></textarea></div>
-      <div class="field" style="margin-bottom:0"><div class="field-label">Prova social</div><textarea class="field-textarea" id="pf-prova" rows="2"></textarea></div>
+      <div class="section-title" style="margin-bottom:12px">Sua voz e tom</div>
+
+      <div class="field">
+        <div class="field-label">Como você fala — seu tom</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">Descreva como você se comunica — o Gemini vai imitar esse estilo em tudo que gerar</div>
+        <textarea class="field-textarea" id="pf-voz" rows="2" placeholder="Ex: Direta, sem enrolação, coloca o dedo na dor, orienta com autoridade sem ser condescendente"></textarea>
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">O que você NUNCA quer soar</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">O Gemini vai evitar esses estilos em todos os conteúdos gerados</div>
+        <textarea class="field-textarea" id="pf-voz-nao" rows="2" placeholder="Ex: Motivacional vazio, clichê de marketing digital, condescendente, professoral demais"></textarea>
+      </div>
     </div>
 
-    <button class="btn-gold" onclick="salvarPerfil()">Salvar alterações →</button>
-    <button class="btn-outline" style="color:var(--error);border-color:var(--error)" onclick="logout()">Sair da conta</button>
+    <div class="card">
+      <div class="section-title" style="margin-bottom:12px">Seu método e pilares</div>
+
+      <div class="field">
+        <div class="field-label">Seus pilares de conteúdo</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">Os 3 temas centrais do seu conteúdo — tudo que você posta cabe em um deles</div>
+        <textarea class="field-textarea" id="pf-pilares" rows="2" placeholder="Ex: Identidade digital · Autoridade organizada · Presença estratégica"></textarea>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Seu método ou abordagem</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">Como você trabalha — aparece nos posts educativos e de autoridade</div>
+        <textarea class="field-textarea" id="pf-metodo" rows="2" placeholder="Ex: BASE → FOCO → VOZ — organizar identidade antes de criar conteúdo. 12 semanas, da base à voz."></textarea>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Sua história de origem</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">O que te trouxe até aqui — usada nos posts de conexão e storytelling</div>
+        <textarea class="field-textarea" id="pf-historia" rows="3" placeholder="Ex: 30 anos no corporativo, saí por desalinhamento, criei o MDP para que outras mulheres não precisem passar pelo mesmo travamento que eu passei..."></textarea>
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">Uma prova social ou resultado real</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:5px">Resultado real de uma aluna — aparece nos posts de produto e prova social</div>
+        <textarea class="field-textarea" id="pf-prova" rows="2" placeholder="Ex: Aluna chegou sem conseguir escrever a própria bio. Em 4 semanas tinha perfil, linha editorial e primeiros posts prontos."></textarea>
+      </div>
+    </div>
+
+    <button class="btn-gold" onclick="salvarPerfil()">Salvar Segundo Cérebro →</button>
+    <button class="btn-outline" style="color:var(--error);border-color:rgba(224,92,92,0.3)" onclick="logout()">Sair da conta</button>
   </div>
   <div class="bottom-nav" id="nav-perfil"></div>
 </div>
@@ -758,8 +836,25 @@ const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
 let currentUser = null;
 
 async function checkSession(){
+  // Get current session
   const { data:{ session } } = await supa.auth.getSession();
-  if(session){ currentUser = session.user; await verificarOnboarding(); }
+  if(session){ 
+    currentUser = session.user; 
+    await verificarOnboarding(); 
+  }
+  
+  // Listen for auth changes (login, logout, token refresh)
+  supa.auth.onAuthStateChange(async (event, session) => {
+    if(event === 'SIGNED_IN' && session){
+      currentUser = session.user;
+      await verificarOnboarding();
+    } else if(event === 'SIGNED_OUT'){
+      currentUser = null;
+      goTo('login');
+    } else if(event === 'TOKEN_REFRESHED' && session){
+      currentUser = session.user;
+    }
+  });
 }
 
 async function loginEmail(){
@@ -1250,7 +1345,11 @@ function coletarDadosOb(){
 }
 
 async function salvarOnboarding(){
-  if(!currentUser){ showToast('Faça login primeiro.'); return; }
+  if(!currentUser){
+    const { data:{ session } } = await supa.auth.getSession();
+    if(session){ currentUser = session.user; }
+    else { showToast('Sessão expirada. Faça login novamente.'); goTo('login'); return; }
+  }
   const dados = coletarDadosOb();
   const btn = document.querySelector('#ob-step-5 .btn-gold');
   btn.textContent = 'Salvando...'; btn.disabled = true;
@@ -1330,7 +1429,12 @@ function preencherCamposPerfil(dados){
 }
 
 async function salvarPerfil(){
-  if(!currentUser){ showToast('Faça login primeiro.'); return; }
+  // Try to get current session if currentUser is null
+  if(!currentUser){
+    const { data:{ session } } = await supa.auth.getSession();
+    if(session){ currentUser = session.user; }
+    else { showToast('Sessão expirada. Faça login novamente.'); goTo('login'); return; }
+  }
   const btn = document.querySelector('#screen-perfil .btn-gold');
   btn.textContent = 'Salvando...'; btn.disabled = true;
 
@@ -1365,17 +1469,29 @@ async function salvarPerfil(){
 // Verificar se precisa de onboarding ao entrar
 async function verificarOnboarding(){
   if(!currentUser) return;
-  await carregarCerebro();
-  const { data } = await supa.from('profiles').select('onboarding_complete, name').eq('id', currentUser.id).single();
-  if(!data || !data.onboarding_complete){
-    goTo('onboarding');
-  } else {
-    // Atualizar nome no dashboard
-    if(data.name){
-      const el = document.querySelector('.welcome-name');
-      if(el) el.textContent = 'Olá, ' + data.name.split(' ')[0] + ' 👋';
+  try {
+    await carregarCerebro();
+    const { data, error } = await supa.from('profiles').select('onboarding_complete, name').eq('id', currentUser.id).single();
+    
+    if(error || !data){
+      // Profile doesn't exist yet — create it and go to onboarding
+      await supa.from('profiles').upsert({ id: currentUser.id, onboarding_complete: false });
+      goTo('onboarding');
+      return;
     }
-    goTo('dashboard');
+    
+    if(!data.onboarding_complete){
+      goTo('onboarding');
+    } else {
+      if(data.name){
+        const el = document.querySelector('.welcome-name');
+        if(el) el.textContent = 'Olá, ' + data.name.split(' ')[0] + ' 👋';
+      }
+      goTo('dashboard');
+    }
+  } catch(e) {
+    console.error('verificarOnboarding error:', e);
+    goTo('dashboard'); // fallback
   }
 }
 
