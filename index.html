@@ -832,7 +832,26 @@ input,textarea,select,button{font-family:inherit;-webkit-appearance:none;appeara
 // ===== SUPABASE =====
 const SUPA_URL = 'https://azgrvkjtwywfxgsgkssi.supabase.co';
 const SUPA_KEY = 'sb_publishable_G1LmYZcGEAsmZtKqGK5cDQ_g3xzCK37';
-const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY, {
+  auth: {
+    persistSession: true,
+    storageKey: 'mdp-studio-auth',
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    flowType: 'implicit'
+  },
+  global: {
+    headers: { 'X-Client-Info': 'mdp-studio-criativo' }
+  }
+});
+
+// Debug helper
+async function debugSession(){
+  const { data, error } = await supa.auth.getSession();
+  console.log('Session debug:', data?.session?.user?.email, error);
+  return data?.session;
+}
 let currentUser = null;
 
 async function checkSession(){
@@ -867,6 +886,7 @@ async function loginEmail(){
   btn.textContent='Entrar no Studio →'; btn.disabled=false;
   if(error){ showToast('E-mail ou senha incorretos.'); return; }
   currentUser = data.user;
+  console.log('Logged in as:', currentUser.email, currentUser.id);
   await verificarOnboarding();
 }
 
@@ -1345,10 +1365,17 @@ function coletarDadosOb(){
 }
 
 async function salvarOnboarding(){
-  if(!currentUser){
-    const { data:{ session } } = await supa.auth.getSession();
-    if(session){ currentUser = session.user; }
-    else { showToast('Sessão expirada. Faça login novamente.'); goTo('login'); return; }
+  let userId = currentUser?.id;
+  if(!userId){
+    try {
+      const { data } = await supa.auth.getSession();
+      if(data?.session?.user){ currentUser = data.session.user; userId = currentUser.id; }
+    } catch(e){ console.error(e); }
+  }
+  if(!userId){ 
+    showToast('Sessão não encontrada. Fazendo login novamente...');
+    setTimeout(()=>goTo('login'), 1500);
+    return; 
   }
   const dados = coletarDadosOb();
   const btn = document.querySelector('#ob-step-5 .btn-gold');
@@ -1429,11 +1456,22 @@ function preencherCamposPerfil(dados){
 }
 
 async function salvarPerfil(){
-  // Try to get current session if currentUser is null
-  if(!currentUser){
-    const { data:{ session } } = await supa.auth.getSession();
-    if(session){ currentUser = session.user; }
-    else { showToast('Sessão expirada. Faça login novamente.'); goTo('login'); return; }
+  // Get fresh session with error handling
+  let userId = currentUser?.id;
+  if(!userId){
+    try {
+      const { data, error } = await supa.auth.getSession();
+      console.log('salvarPerfil session:', data?.session?.user?.email, error);
+      if(data?.session?.user){
+        currentUser = data.session.user;
+        userId = currentUser.id;
+      }
+    } catch(e){ console.error(e); }
+  }
+  if(!userId){ 
+    showToast('Sessão não encontrada. Fazendo login novamente...');
+    setTimeout(()=>goTo('login'), 1500);
+    return; 
   }
   const btn = document.querySelector('#screen-perfil .btn-gold');
   btn.textContent = 'Salvando...'; btn.disabled = true;
@@ -1455,14 +1493,14 @@ async function salvarPerfil(){
     user_id: currentUser.id, category: 'cerebro', question: k, answer: v
   }));
 
-  await supa.from('identity_brain').delete().eq('user_id', currentUser.id);
+  await supa.from('identity_brain').delete().eq('user_id', userId);
   const { error } = await supa.from('identity_brain').insert(campos);
 
   btn.textContent = 'Salvar alterações →'; btn.disabled = false;
-  if(error){ showToast('Erro ao salvar.'); return; }
+  if(error){ console.error('Save error:', error); showToast('Erro: ' + error.message); return; }
 
   atualizarCerebro(dados);
-  await supa.from('profiles').upsert({ id: currentUser.id, name: dados.nome });
+  await supa.from('profiles').upsert({ id: userId, name: dados.nome });
   showToast('✓ Perfil atualizado!');
 }
 
