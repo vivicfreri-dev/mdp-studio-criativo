@@ -1456,26 +1456,30 @@ function preencherCamposPerfil(dados){
 }
 
 async function salvarPerfil(){
-  // Get fresh session with error handling
-  let userId = currentUser?.id;
-  if(!userId){
-    try {
-      const { data, error } = await supa.auth.getSession();
-      console.log('salvarPerfil session:', data?.session?.user?.email, error);
-      if(data?.session?.user){
-        currentUser = data.session.user;
-        userId = currentUser.id;
-      }
-    } catch(e){ console.error(e); }
-  }
-  if(!userId){ 
-    showToast('Sessão não encontrada. Fazendo login novamente...');
-    setTimeout(()=>goTo('login'), 1500);
-    return; 
-  }
   const btn = document.querySelector('#screen-perfil .btn-gold');
-  btn.textContent = 'Salvando...'; btn.disabled = true;
-
+  btn.textContent = 'Verificando sessão...'; btn.disabled = true;
+  
+  // Always get fresh session directly from Supabase
+  const { data: sessionData, error: sessionError } = await supa.auth.getSession();
+  
+  console.log('Saving profile - session:', JSON.stringify({
+    hasSession: !!sessionData?.session,
+    userId: sessionData?.session?.user?.id,
+    email: sessionData?.session?.user?.email,
+    error: sessionError?.message
+  }));
+  
+  if(!sessionData?.session?.user){
+    btn.textContent = 'Salvar Segundo Cérebro →'; btn.disabled = false;
+    showToast('Por favor faça login novamente.');
+    setTimeout(()=>goTo('login'), 1500);
+    return;
+  }
+  
+  const userId = sessionData.session.user.id;
+  currentUser = sessionData.session.user;
+  btn.textContent = 'Salvando...';
+  
   const mapa = {
     'pf-nome':'nome','pf-nicho':'nicho','pf-produto':'produto','pf-posicionamento':'posicionamento',
     'pf-persona-nome':'persona_nome','pf-persona-quem':'persona_quem','pf-persona-dor':'persona_dor',
@@ -1489,19 +1493,34 @@ async function salvarPerfil(){
     if(el) dados[key] = el.value.trim();
   });
 
-  const campos = Object.entries(dados).map(([k,v])=>({
-    user_id: currentUser.id, category: 'cerebro', question: k, answer: v
-  }));
+  const campos = Object.entries(dados)
+    .filter(([k,v]) => v.length > 0)
+    .map(([k,v])=>({ user_id: userId, category: 'cerebro', question: k, answer: v }));
 
-  await supa.from('identity_brain').delete().eq('user_id', userId);
-  const { error } = await supa.from('identity_brain').insert(campos);
+  // Delete old and insert new
+  const { error: delError } = await supa.from('identity_brain').delete().eq('user_id', userId);
+  console.log('Delete result:', delError?.message || 'ok');
+  
+  if(campos.length > 0){
+    const { error: insError } = await supa.from('identity_brain').insert(campos);
+    console.log('Insert result:', insError?.message || 'ok', campos.length, 'records');
+    if(insError){ 
+      btn.textContent = 'Salvar Segundo Cérebro →'; btn.disabled = false;
+      showToast('Erro ao salvar: ' + insError.message); 
+      return; 
+    }
+  }
 
-  btn.textContent = 'Salvar alterações →'; btn.disabled = false;
-  if(error){ console.error('Save error:', error); showToast('Erro: ' + error.message); return; }
+  const { error: profError } = await supa.from('profiles').upsert({ 
+    id: userId, 
+    name: dados.nome || '',
+    onboarding_complete: true 
+  });
+  console.log('Profile upsert:', profError?.message || 'ok');
 
   atualizarCerebro(dados);
-  await supa.from('profiles').upsert({ id: userId, name: dados.nome });
-  showToast('✓ Perfil atualizado!');
+  btn.textContent = 'Salvar Segundo Cérebro →'; btn.disabled = false;
+  showToast('✓ Segundo Cérebro salvo com sucesso!');
 }
 
 // Verificar se precisa de onboarding ao entrar
