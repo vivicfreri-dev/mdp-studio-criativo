@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MDP Studio Criativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* ===== RESET & VARS ===== */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#182b3b;--navy-deep:#0f1923;--navy-mid:#1e3548;
+  --gold:#d4be8e;--gold-dark:#806541;--gold-bright:#dcc592;
+  --taupe:#918978;--silver:#bab8b4;
+  --bg:#e2e1dd;--bg2:#d7d5d1;--white:#ffffff;--surface:#f5f3ef;
+  --error:#e05c5c;--success:#4caf88;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--navy-deep);overflow:hidden}
+input,textarea,select,button{font-family:inherit;-webkit-appearance:none;appearance:none}
+
+/* ===== APP SHELL ===== */
+#app{height:100vh;display:flex;flex-direction:column;max-width:430px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+
+/* ===== SCREENS ===== */
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+.screen.active{display:flex}
+
+/* ===== HEADER ===== */
+.hdr{background:var(--navy);padding:14px 16px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.hdr-right{text-align:right}
+.hdr-label{font-size:9px;color:var(--taupe);letter-spacing:1px;text-transform:uppercase}
+.hdr-title{font-size:11px;color:var(--gold);font-weight:500;margin-top:1px}
+
+/* ===== SCROLL BODY ===== */
+.scroll-body{flex:1;overflow-y:auto;padding:14px 16px 80px;-webkit-overflow-scrolling:touch}
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav{position:absolute;bottom:0;left:0;right:0;background:var(--navy);border-top:1px solid rgba(212,190,142,0.12);display:flex;padding:10px 0 max(12px,env(safe-area-inset-bottom));z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:2px 0;border:none;background:none}
+.nav-icon{width:20px;height:20px;border-radius:4px;background:rgba(212,190,142,0.1);display:flex;align-items:center;justify-content:center;transition:background .2s}
+.nav-icon.active{background:rgba(212,190,142,0.22)}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:rgba(212,190,142,0.35)}
+.nav-sq{width:8px;height:8px;border-radius:2px;background:rgba(212,190,142,0.35)}
+.nav-icon.active .nav-dot,.nav-icon.active .nav-sq{background:var(--gold)}
+.nav-label{font-size:9px;color:rgba(212,190,142,0.35);font-weight:500;transition:color .2s}
+.nav-label.active{color:var(--gold)}
+
+/* ===== TYPOGRAPHY ===== */
+.page-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--navy)}
+.page-sub{font-size:11px;color:var(--taupe);margin-top:2px}
+.section-title{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--taupe);font-weight:600;margin-bottom:8px}
+
+/* ===== CARDS ===== */
+.card{background:var(--white);border-radius:12px;border:1px solid rgba(24,43,59,0.08);padding:14px 16px;margin-bottom:12px}
+.card-dark{background:var(--navy);border-radius:12px;border:1px solid rgba(212,190,142,0.12);padding:14px 16px;margin-bottom:12px}
+.card-gold{background:rgba(212,190,142,0.07);border:1px solid rgba(212,190,142,0.2);border-radius:12px;padding:13px 14px;margin-bottom:12px}
+
+/* ===== BUTTONS ===== */
+.btn-primary{width:100%;background:var(--navy);color:var(--gold);border:none;padding:13px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px;transition:opacity .2s}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-gold{width:100%;background:var(--gold);color:var(--navy);border:none;padding:13px;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px}
+.btn-outline{width:100%;background:none;border:1.5px solid rgba(24,43,59,0.15);color:var(--taupe);padding:11px;border-radius:50px;font-size:12px;cursor:pointer;margin-bottom:8px}
+.btn-sm{font-size:10px;padding:5px 12px;border-radius:50px;border:1px solid rgba(24,43,59,0.1);color:var(--taupe);background:var(--white);cursor:pointer}
+
+/* ===== INPUTS ===== */
+.field{margin-bottom:12px}
+.field-label{font-size:11px;color:var(--taupe);margin-bottom:5px;font-weight:500}
+.field-input,.field-textarea,.field-select{width:100%;border:1.5px solid rgba(24,43,59,0.1);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--navy);outline:none;background:var(--white);transition:border-color .2s;line-height:1.6}
+.field-input:focus,.field-textarea:focus,.field-select:focus{border-color:var(--gold)}
+.field-input::placeholder,.field-textarea::placeholder{color:var(--silver)}
+.field-textarea{resize:none}
+.field-input-dark{width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(212,190,142,0.15);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--white);outline:none;transition:border-color .2s}
+.field-input-dark:focus{border-color:rgba(212,190,142,.5)}
+.field-input-dark::placeholder{color:rgba(255,255,255,.2)}
+
+/* ===== TAGS & PILLS ===== */
+.tag{font-size:9px;padding:2px 8px;border-radius:50px;font-weight:600}
+.tag-navy{background:rgba(24,43,59,0.08);color:var(--navy)}
+.tag-gold{background:rgba(212,190,142,0.15);color:var(--gold-dark)}
+.tag-taupe{background:rgba(145,137,120,0.12);color:var(--taupe)}
+.pill{font-size:10px;padding:5px 11px;border-radius:50px;border:1.5px solid rgba(24,43,59,0.1);color:var(--taupe);cursor:pointer;background:var(--white);transition:all .2s;font-weight:500}
+.pill.on{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+
+/* ===== PROGRESS ===== */
+.prog-bar{height:3px;background:rgba(24,43,59,0.08);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease}
+.prog-bar-dark{height:3px;background:rgba(212,190,142,0.1);border-radius:2px;overflow:hidden}
+.prog-fill-dark{height:100%;background:var(--gold);border-radius:2px}
+
+/* ===== SHIMMER ===== */
+@keyframes sh{0%,100%{opacity:1}50%{opacity:.4}}
+.shimmer{animation:sh 1.2s ease-in-out infinite;background:rgba(24,43,59,0.06);border-radius:8px}
+
+/* ===== SLIDE CARDS (para posts gerados) ===== */
+.slide-card{background:var(--white);border-radius:12px;border:1px solid rgba(24,43,59,0.08);overflow:hidden;margin-bottom:8px;transition:border-color .2s}
+.slide-card.editing{border-color:var(--gold)}
+.slide-top{padding:9px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(24,43,59,0.05)}
+.slide-num{width:19px;height:19px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--gold)}
+.slide-body{padding:11px 13px;font-size:12px;color:var(--navy);line-height:1.75;white-space:pre-line}
+.slide-ta{width:100%;border:none;outline:none;font-size:12px;color:var(--navy);line-height:1.75;resize:none;background:transparent;display:none}
+.slide-hint{font-size:10px;color:var(--taupe);padding:5px 13px 9px;font-style:italic;border-top:1px solid rgba(24,43,59,0.04)}
+.slide-actions{display:flex;gap:5px;padding:7px 13px;border-top:1px solid rgba(24,43,59,0.05);flex-wrap:wrap}
+
+/* ===== LEGENDA SECTION ===== */
+.legenda-box{display:none;background:var(--white);border-radius:12px;border:1.5px solid var(--gold);padding:14px;margin-bottom:8px}
+.legenda-box.show{display:block}
+.legenda-text{font-size:12px;color:var(--navy);line-height:1.8;white-space:pre-line;padding:10px;background:var(--surface);border-radius:8px;margin-bottom:8px}
+
+/* ===== FORMATO SELECTOR ===== */
+.fmt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.fmt-opt{border:2px solid rgba(24,43,59,0.1);border-radius:12px;padding:12px 10px;cursor:pointer;text-align:center;transition:all .2s;background:var(--white)}
+.fmt-opt.on{border-color:var(--gold);background:rgba(212,190,142,0.06)}
+.fmt-opt.on .fmt-name{color:var(--navy)}
+.fmt-icon{font-size:20px;margin-bottom:5px}
+.fmt-name{font-size:11px;font-weight:600;color:var(--taupe);transition:color .2s}
+.fmt-desc{font-size:9px;color:var(--silver);margin-top:2px}
+
+/* ===== LOGIN SCREEN ===== */
+#screen-login{background:var(--navy-deep)}
+.login-top{padding:40px 28px 0;text-align:center}
+.login-logo{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:var(--gold);letter-spacing:3px}
+.login-sub{font-size:10px;color:var(--taupe);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+.login-divider{width:40px;height:1px;background:rgba(212,190,142,.25);margin:14px auto}
+.login-tagline{font-family:'Playfair Display',serif;font-size:14px;color:rgba(212,190,142,.65);line-height:1.5}
+.login-tabs{display:flex;background:rgba(255,255,255,.05);border-radius:50px;padding:4px;margin:24px 28px 0}
+.login-tab{flex:1;padding:9px;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;text-align:center;color:var(--taupe);border:none;background:none;transition:all .2s}
+.login-tab.on{background:var(--gold);color:var(--navy)}
+.login-form{padding:16px 28px 28px;flex:1;overflow-y:auto}
+.login-divider-or{display:flex;align-items:center;gap:10px;margin:14px 0}
+.login-or-line{flex:1;height:1px;background:rgba(212,190,142,.1)}
+.login-or-text{font-size:11px;color:var(--taupe)}
+.btn-magic{width:100%;background:none;border:1.5px solid rgba(212,190,142,.2);color:rgba(212,190,142,.7);border-radius:50px;padding:11px;font-size:13px;cursor:pointer;transition:all .2s}
+.login-terms{font-size:10px;color:var(--taupe);text-align:center;margin-top:14px;line-height:1.6}
+.login-terms span{color:rgba(212,190,142,.5);cursor:pointer;text-decoration:underline}
+.login-forgot{font-size:11px;color:rgba(212,190,142,.4);text-align:right;margin-top:-6px;margin-bottom:12px;cursor:pointer}
+
+/* ===== DASHBOARD ===== */
+.welcome-banner{background:var(--navy);border-radius:12px;padding:16px;margin-bottom:12px}
+.welcome-name{font-family:'Playfair Display',serif;font-size:17px;color:var(--white);font-weight:600}
+.welcome-idea-label{font-size:9px;color:var(--taupe);letter-spacing:1px;text-transform:uppercase;margin-top:10px;margin-bottom:4px}
+.welcome-idea{font-size:11px;color:var(--gold);line-height:1.6}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:var(--white);border-radius:10px;border:1px solid rgba(24,43,59,0.08);padding:12px}
+.stat-num{font-family:'Playfair Display',serif;font-size:26px;color:var(--navy);font-weight:600;line-height:1}
+.stat-label{font-size:10px;color:var(--taupe);margin-top:3px}
+.qa-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.qa-btn{background:var(--white);border:1px solid rgba(24,43,59,0.08);border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .2s}
+.qa-btn:hover{border-color:var(--gold)}
+.qa-icon{font-size:18px;margin-bottom:5px}
+.qa-label{font-size:10px;color:var(--navy);font-weight:500;line-height:1.3}
+
+/* ===== TRILHA ===== */
+.mod-card{background:var(--white);border-radius:12px;border:1px solid rgba(24,43,59,0.08);margin-bottom:10px;overflow:hidden}
+.mod-header{padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.mod-node{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:13px;font-weight:700;flex-shrink:0}
+.mod-node.done{background:var(--gold);color:var(--navy)}
+.mod-node.active{background:var(--navy);color:var(--gold);border:2px solid var(--gold)}
+.mod-node.locked{background:var(--bg2);color:var(--silver)}
+.mod-info{flex:1}
+.mod-title{font-size:13px;font-weight:600;color:var(--navy)}
+.mod-sub{font-size:10px;color:var(--taupe);margin-top:2px}
+.mod-badge{font-size:9px;padding:2px 8px;border-radius:50px;font-weight:600}
+.mod-badge.done{background:rgba(212,190,142,0.15);color:var(--gold-dark)}
+.mod-badge.active{background:rgba(24,43,59,0.08);color:var(--navy)}
+.mod-badge.locked{background:var(--bg2);color:var(--silver)}
+.mod-tasks{border-top:1px solid rgba(24,43,59,0.06);display:none}
+.mod-tasks.open{display:block}
+.task-row{display:flex;align-items:center;gap:10px;padding:10px 14px 10px 52px;border-bottom:1px solid rgba(24,43,59,0.04);cursor:pointer}
+.task-row:last-child{border-bottom:none}
+.task-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.task-dot.done{background:var(--gold);color:var(--navy)}
+.task-dot.active{background:var(--navy);color:var(--gold)}
+.task-dot.pending{background:var(--bg2);color:var(--silver)}
+.task-name{font-size:12px;color:var(--navy);font-weight:500;flex:1}
+.task-output{font-size:9px;padding:2px 7px;border-radius:50px;background:rgba(212,190,142,0.1);color:var(--gold-dark);font-weight:600}
+
+/* ===== PRODUÇÃO ===== */
+.kanban-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;overflow-x:auto}
+.kanban-col{background:var(--surface);border-radius:10px;padding:10px;min-height:200px}
+.kanban-head{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--taupe);font-weight:600;margin-bottom:8px}
+.kanban-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--navy);color:var(--gold);font-size:9px;font-weight:700;margin-left:4px}
+.kanban-item{background:var(--white);border-radius:8px;padding:9px 10px;margin-bottom:6px;border:1px solid rgba(24,43,59,0.06);cursor:pointer}
+.kanban-item-title{font-size:11px;color:var(--navy);font-weight:500;line-height:1.4}
+.kanban-item-meta{font-size:9px;color:var(--taupe);margin-top:4px}
+
+/* ===== BIBLIOTECA ===== */
+.bib-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.bib-stat{background:var(--white);border-radius:10px;border:1px solid rgba(24,43,59,0.08);padding:10px;text-align:center}
+.bib-num{font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);font-weight:600}
+.bib-lbl{font-size:9px;color:var(--taupe);margin-top:2px}
+.search-wrap{position:relative;margin-bottom:10px}
+.search-input{width:100%;background:var(--white);border:1.5px solid rgba(24,43,59,0.1);border-radius:10px;padding:10px 14px 10px 36px;font-size:13px;color:var(--navy);outline:none}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.35;pointer-events:none}
+.bib-card{background:var(--white);border-radius:12px;border:1px solid rgba(24,43,59,0.08);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.bib-card:hover{border-color:rgba(212,190,142,.4)}
+.bib-title{font-size:12px;color:var(--navy);font-weight:500;line-height:1.4;margin-bottom:7px}
+.bib-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.bib-acoes{display:flex;gap:5px;margin-top:9px;padding-top:9px;border-top:1px solid rgba(24,43,59,0.05)}
+
+/* ===== O QUE POSTAR HOJE ===== */
+.hero-hoje{background:var(--navy);border-radius:12px;padding:16px;margin-bottom:14px}
+.hero-data{font-size:9px;color:var(--taupe);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.hero-ttl{font-family:'Playfair Display',serif;font-size:16px;color:var(--white);font-weight:600;line-height:1.35;margin-bottom:6px}
+.hero-sub{font-size:11px;color:rgba(212,190,142,.6);line-height:1.6;margin-bottom:12px}
+.sug-card{background:var(--white);border-radius:12px;border:1.5px solid rgba(24,43,59,0.08);padding:13px 14px;margin-bottom:9px;cursor:pointer;transition:all .2s}
+.sug-card:hover{border-color:rgba(212,190,142,.4)}
+.sug-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:7px}
+.sug-num{width:22px;height:22px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--gold);flex-shrink:0;margin-top:1px}
+.sug-titulo{font-size:12px;color:var(--navy);font-weight:600;line-height:1.4;flex:1}
+.sug-angulo{font-size:11px;color:var(--taupe);margin-top:4px;line-height:1.5;font-style:italic}
+.sug-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+
+/* ===== EMPTY STATE ===== */
+.empty{text-align:center;padding:40px 20px;color:var(--silver)}
+.empty-icon{font-size:32px;margin-bottom:10px;opacity:.45}
+.empty-txt{font-size:12px;line-height:1.6}
+
+/* ===== DESKTOP LAYOUT ===== */
+@media (min-width: 768px) {
+  body { background: var(--navy-deep); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  #app { 
+    height: 100vh; max-height: 900px; 
+    border-radius: 24px; 
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+    border: 1px solid rgba(212,190,142,0.1);
+  }
+}
+@media (min-width: 1200px) {
+  #app { max-width: 480px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ============================= LOGIN ============================= -->
+<div id="screen-login" class="screen active" style="overflow-y:auto">
+  <div class="login-top">
+    <div class="login-logo">MDP</div>
+    <div class="login-sub">Studio Criativo</div>
+    <div class="login-divider"></div>
+    <div class="login-tagline">Autoridade não se inventa.<br>Se organiza.</div>
+  </div>
+  <div class="login-tabs">
+    <button class="login-tab on" id="tabEntrar" onclick="showLoginTab('entrar')">Entrar</button>
+    <button class="login-tab" id="tabCriar" onclick="showLoginTab('criar')">Criar conta</button>
+  </div>
+  <div class="login-form" id="formEntrar">
+    <div class="field" style="margin-top:4px">
+      <div class="field-label" style="color:var(--taupe)">E-mail</div>
+      <input class="field-input-dark" type="email" placeholder="seu@email.com" id="loginEmail">
+    </div>
+    <div class="field">
+      <div class="field-label" style="color:var(--taupe)">Senha</div>
+      <input class="field-input-dark" type="password" placeholder="••••••••" id="loginSenha">
+    </div>
+    <div class="login-forgot">Esqueci minha senha</div>
+    <button class="btn-gold" style="margin-top:4px" onclick="goTo('dashboard')">Entrar no Studio →</button>
+    <div class="login-divider-or">
+      <div class="login-or-line"></div><div class="login-or-text">ou</div><div class="login-or-line"></div>
+    </div>
+    <button class="btn-magic">✉️ Entrar com link mágico</button>
+    <div class="login-terms">Ao entrar você concorda com os <span>Termos de Uso</span></div>
+  </div>
+  <div class="login-form" id="formCriar" style="display:none">
+    <div class="field" style="margin-top:4px">
+      <div class="field-label" style="color:var(--taupe)">Seu nome</div>
+      <input class="field-input-dark" type="text" placeholder="Como podemos te chamar?">
+    </div>
+    <div class="field">
+      <div class="field-label" style="color:var(--taupe)">E-mail</div>
+      <input class="field-input-dark" type="email" placeholder="seu@email.com">
+    </div>
+    <div class="field">
+      <div class="field-label" style="color:var(--taupe)">Senha</div>
+      <input class="field-input-dark" type="password" placeholder="Mínimo 8 caracteres">
+    </div>
+    <button class="btn-gold" style="margin-top:4px" onclick="goTo('onboarding')">Criar minha conta →</button>
+    <div class="login-terms">Ao criar conta você concorda com os <span>Termos de Uso</span></div>
+  </div>
+</div>
+
+<!-- ============================= DASHBOARD ============================= -->
+<div id="screen-dashboard" class="screen">
+  <div class="hdr">
+    <div class="logo">MDP</div>
+    <div class="hdr-right"><div class="hdr-label">Studio Criativo</div><div class="hdr-title">Dashboard</div></div>
+  </div>
+  <div class="scroll-body">
+    <div class="welcome-banner">
+      <div class="welcome-name">Olá, Vivi 👋</div>
+      <div class="welcome-idea-label">💡 Ideia para hoje</div>
+      <div class="welcome-idea">"Você tem 30 anos de experiência que valem ouro. Que tal compartilhar uma decisão difícil que tomou na carreira — e o que ela te ensinou sobre autoridade?"</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num">3<span style="font-size:14px;color:var(--taupe)">/8</span></div>
+        <div class="stat-label">Módulos em progresso</div>
+        <div class="prog-bar" style="margin-top:8px;margin-bottom:0"><div class="prog-fill" style="width:37%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">14</div>
+        <div class="stat-label">Conteúdos gerados</div>
+        <div class="prog-bar" style="margin-top:8px;margin-bottom:0"><div class="prog-fill" style="width:58%"></div></div>
+      </div>
+    </div>
+    <div class="qa-grid">
+      <div class="qa-btn" onclick="goTo('hoje')"><div class="qa-icon">💡</div><div class="qa-label">O que postar hoje</div></div>
+      <div class="qa-btn" onclick="goTo('trilha')"><div class="qa-icon">🗺️</div><div class="qa-label">Continuar trilha</div></div>
+      <div class="qa-btn" onclick="goTo('biblioteca')"><div class="qa-icon">📚</div><div class="qa-label">Biblioteca</div></div>
+    </div>
+    <div class="section-title">Pipeline de conteúdo</div>
+    <div class="card" style="padding:12px">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+        <div style="background:var(--surface);border-radius:8px;padding:9px;text-align:center">
+          <div style="font-size:9px;color:var(--taupe);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Ideias</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--navy);font-weight:600">3</div>
+        </div>
+        <div style="background:var(--surface);border-radius:8px;padding:9px;text-align:center">
+          <div style="font-size:9px;color:var(--taupe);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Criando</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--navy);font-weight:600">2</div>
+        </div>
+        <div style="background:var(--surface);border-radius:8px;padding:9px;text-align:center">
+          <div style="font-size:9px;color:var(--taupe);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pronto</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--gold-dark);font-weight:600">5</div>
+        </div>
+        <div style="background:var(--surface);border-radius:8px;padding:9px;text-align:center">
+          <div style="font-size:9px;color:var(--taupe);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Publicado</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--navy);font-weight:600">4</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-title">Segundo Cérebro Criativo</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:12px;color:var(--navy);font-weight:500">73% preenchido</div>
+        <button class="btn-sm" onclick="goTo('trilha')">Completar →</button>
+      </div>
+      <div class="prog-bar" style="margin-bottom:0"><div class="prog-fill" style="width:73%"></div></div>
+    </div>
+  </div>
+  <div class="bottom-nav" id="nav-dashboard"></div>
+</div>
+
+<!-- ============================= TRILHA ============================= -->
+<div id="screen-trilha" class="screen">
+  <div class="hdr">
+    <div class="logo">MDP</div>
+    <div class="hdr-right"><div class="hdr-label">Studio Criativo</div><div class="hdr-title">Minha Trilha</div></div>
+  </div>
+  <div class="scroll-body">
+    <div style="margin-bottom:12px">
+      <div class="page-title">Trilha de Módulos</div>
+      <div class="page-sub">Execute cada tarefa — cada uma entrega um conteúdo pronto para publicar</div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-header" onclick="toggleMod(this)">
+        <div class="mod-node done">✓</div>
+        <div class="mod-info"><div class="mod-title">Módulo 1 — Firmar as Bases</div><div class="mod-sub">Bio · Linha Editorial · Segundo Cérebro · Interesses · Autopercepção</div></div>
+        <span class="mod-badge done">Concluído</span>
+      </div>
+      <div class="mod-tasks open">
+        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T1 — Bio Magnética no Instagram</div><span class="task-output">Bio pronta</span></div>
+        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T2 — Linha Editorial</div><span class="task-output">Editorial</span></div>
+        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T3 — Segundo Cérebro Criativo</div><span class="task-output">Perfil IA</span></div>
+        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T4 — Lista de Interesses</div><span class="task-output">Lista</span></div>
+        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name">T5 — Autopercepção e Audiência</div><span class="task-output">Diagnóstico</span></div>
+      </div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-header" onclick="toggleMod(this)">
+        <div class="mod-node active">2</div>
+        <div class="mod-info"><div class="mod-title">Módulo 2 — Os 9 Primeiros Posts</div><div class="mod-sub">Carrosséis · Reels · Stories · Storytelling · Banco de ideias</div></div>
+        <span class="mod-badge active">Em progresso</span>
+      </div>
+      <div class="mod-tasks">
+        <div class="task-row"><div class="task-dot done">✓</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t6_autoridade')">T6 — 2 Carrosséis (Autoridade + Quem sou) →</div><span class="task-output">2 posts</span></div>
+        <div class="task-row" onclick="abrirGerador('t6_autoridade')"><div class="task-dot active">▶</div><div class="task-name">T7 — Posicionamento + Como eu consegui</div><span class="task-output">2 posts</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t8_checklist')">T8 — Checklist + Post de Produto →</div><span class="task-output">2 posts</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t9_passo')">T9 — Passo a passo + Reels Autoridade →</div><span class="task-output">2 posts</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t10_conexao')">T10 — Conexão + Post Hype →</div><span class="task-output">2 posts</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t10_conexao')">T11 — Dia da Persona →</div><span class="task-output">1 post</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name" style="cursor:pointer" onclick="abrirGerador('t12_story')">T12 — Storytelling + Stories →</div><span class="task-output">Stories</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name">T13 — 20 Ideias Topo de Funil</div><span class="task-output">Banco</span></div>
+        <div class="task-row"><div class="task-dot pending">·</div><div class="task-name">T14 — 20 Ideias Meio de Funil + Lives</div><span class="task-output">Banco</span></div>
+      </div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-header">
+        <div class="mod-node locked">3</div>
+        <div class="mod-info"><div class="mod-title">Módulo 3 — Nível de Consciência</div><div class="mod-sub">Em breve</div></div>
+        <span class="mod-badge locked">Bloqueado</span>
+      </div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-header">
+        <div class="mod-node locked">4</div>
+        <div class="mod-info"><div class="mod-title">Módulo 4 — Calendário de Vendas</div><div class="mod-sub">Em breve</div></div>
+        <span class="mod-badge locked">Bloqueado</span>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav" id="nav-trilha"></div>
+</div>
+
+<!-- ============================= PRODUÇÃO ============================= -->
+<div id="screen-producao" class="screen">
+  <div class="hdr">
+    <div class="logo">MDP</div>
+    <div class="hdr-right"><div class="hdr-label">Studio Criativo</div><div class="hdr-title">Produção</div></div>
+  </div>
+  <div class="scroll-body">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px">
+      <div><div class="page-title">Studio de Conteúdo</div><div class="page-sub">Gerencie suas peças de conteúdo</div></div>
+      <button class="btn-sm" style="margin-top:4px">+ Nova ideia</button>
+    </div>
+    <div style="overflow-x:auto;padding-bottom:4px">
+      <div style="display:grid;grid-template-columns:repeat(4,140px);gap:8px;min-width:600px">
+        <div style="background:var(--surface);border-radius:10px;padding:10px">
+          <div style="font-size:9px;color:var(--taupe);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">💡 Ideias <span style="background:var(--navy);color:var(--gold);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-left:4px">3</span></div>
+          <div class="kanban-item"><div class="kanban-item-title">Minha transição do bancário ao digital</div><div class="kanban-item-meta">Instagram</div></div>
+          <div class="kanban-item"><div class="kanban-item-title">O que 30 anos me ensinaram</div><div class="kanban-item-meta">LinkedIn</div></div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:10px">
+          <div style="font-size:9px;color:var(--taupe);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">✍️ Criando <span style="background:var(--navy);color:var(--gold);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-left:4px">2</span></div>
+          <div class="kanban-item"><div class="kanban-item-title">Amnésia Identitária Digital</div><div class="kanban-item-meta">Instagram</div></div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:10px">
+          <div style="font-size:9px;color:var(--taupe);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">✅ Pronto <span style="background:var(--gold);color:var(--navy);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-left:4px">5</span></div>
+          <div class="kanban-item"><div class="kanban-item-title">Autoridade não se inventa</div><div class="kanban-item-meta">Instagram</div></div>
+          <div class="kanban-item"><div class="kanban-item-title">BASE→FOCO→VOZ</div><div class="kanban-item-meta">LinkedIn</div></div>
+        </div>
+        <div style="background:var(--surface);border-radius:10px;padding:10px">
+          <div style="font-size:9px;color:var(--taupe);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">📤 Publicado <span style="background:var(--navy);color:var(--gold);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;margin-left:4px">4</span></div>
+          <div class="kanban-item"><div class="kanban-item-title">Minha história com Helena</div><div class="kanban-item-meta">Instagram</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav" id="nav-producao"></div>
+</div>
+
+<!-- ============================= BIBLIOTECA ============================= -->
+<div id="screen-biblioteca" class="screen">
+  <div class="hdr">
+    <div class="logo">MDP</div>
+    <div class="hdr-right"><div class="hdr-label">Studio Criativo</div><div class="hdr-title">Biblioteca</div></div>
+  </div>
+  <div class="scroll-body">
+    <div style="margin-bottom:12px"><div class="page-title">Biblioteca</div><div class="page-sub">Todo conteúdo gerado, organizado para reutilizar</div></div>
+    <div class="bib-stats">
+      <div class="bib-stat"><div class="bib-num">14</div><div class="bib-lbl">Gerados</div></div>
+      <div class="bib-stat"><div class="bib-num">8</div><div class="bib-lbl">Aprovados</div></div>
+      <div class="bib-stat"><div class="bib-num">6</div><div class="bib-lbl">Publicados</div></div>
+    </div>
+    <div class="search-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="#182b3b" stroke-width="1.5"/><path d="M10.5 10.5L13 13" stroke="#182b3b" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input class="search-input" placeholder="Buscar por título ou tema...">
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      <div class="pill on">Todos</div>
+      <div class="pill">Carrossel</div>
+      <div class="pill">Reels</div>
+      <div class="pill">Stories</div>
+      <div class="pill">Estático</div>
+    </div>
+    <div id="bib-lista"></div>
+  </div>
+  <div class="bottom-nav" id="nav-biblioteca"></div>
+</div>
+
+<!-- ============================= O QUE POSTAR HOJE ============================= -->
+<div id="screen-hoje" class="screen">
+  <div class="hdr">
+    <div class="logo">MDP</div>
+    <div class="hdr-right"><div class="hdr-label">Studio Criativo</div><div class="hdr-title">O que postar hoje</div></div>
+  </div>
+  <div class="scroll-body">
+    <div class="hero-hoje">
+      <div class="hero-data">Sábado, 28 de março de 2026</div>
+      <div class="hero-ttl">O que você deveria postar hoje, Vivi?</div>
+      <div class="hero-sub">O Gemini analisou seu Segundo Cérebro, histórico, pilares e campanha para sugerir as melhores ideias agora.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">
+        <span style="font-size:10px;padding:2px 9px;border-radius:50px;background:rgba(212,190,142,.1);color:var(--gold);font-weight:500">Módulo 1 completo</span>
+        <span style="font-size:10px;padding:2px 9px;border-radius:50px;background:rgba(212,190,142,.1);color:var(--gold);font-weight:500">Turma 2 aberta</span>
+        <span style="font-size:10px;padding:2px 9px;border-radius:50px;background:rgba(212,190,142,.1);color:var(--gold);font-weight:500">6 dias sem postar</span>
+      </div>
+    </div>
+    <div id="hoje-gen">
+      <button class="btn-primary" onclick="gerarHoje()">Gerar sugestões personalizadas →</button>
+    </div>
+    <div id="hoje-sugestoes" style="display:none">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <div class="pill on">Todas</div>
+        <div class="pill">Rápido</div>
+        <div class="pill">Profundo</div>
+        <div class="pill">Venda</div>
+      </div>
+      <div class="section-title">5 sugestões para hoje</div>
+      <div id="hoje-lista"></div>
+    </div>
+  </div>
+  <div class="bottom-nav" id="nav-hoje"></div>
+</div>
+
+
+<!-- ============================= GERADOR ============================= -->
+<div id="screen-gerador" class="screen">
+  <div class="hdr">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="goTo('trilha')" style="background:none;border:none;color:var(--gold);cursor:pointer;font-size:18px;padding:0">←</button>
+      <div class="logo">MDP</div>
+    </div>
+    <div class="hdr-right"><div class="hdr-label" id="gen-modulo">Módulo 2</div><div class="hdr-title" id="gen-titulo">Gerador de Conteúdo</div></div>
+  </div>
+  <div class="scroll-body" id="gen-body">
+
+    <div class="card-dark" id="gen-cerebro-strip">
+      <div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--taupe);font-weight:600;margin-bottom:6px">Segundo Cérebro ativo</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px" id="gen-cerebro-tags"></div>
+    </div>
+
+    <!-- INPUT DE TEMA (aparece em algumas tarefas) -->
+    <div id="gen-tema-wrap" style="display:none" class="card">
+      <div class="field">
+        <div class="field-label" id="gen-tema-label">Tema ou experiência</div>
+        <div style="font-size:10px;color:var(--taupe);margin-bottom:6px;font-style:italic" id="gen-tema-hint">Quanto mais específica, melhor o resultado.</div>
+        <textarea class="field-textarea" id="gen-tema-input" rows="3" placeholder="Descreva aqui..."></textarea>
+      </div>
+    </div>
+
+    <!-- FORMATO -->
+    <div class="card" id="gen-fmt-wrap">
+      <div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--taupe);font-weight:600;margin-bottom:10px">Formato</div>
+      <div class="fmt-grid" id="gen-fmt-grid"></div>
+    </div>
+
+    <div class="aviso-card card-gold" id="gen-aviso" style="display:none">
+      <div style="font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-dark);font-weight:600;margin-bottom:5px" id="gen-aviso-title"></div>
+      <div style="font-size:11px;color:var(--navy);line-height:1.7" id="gen-aviso-text"></div>
+    </div>
+
+    <button class="btn-primary" id="gen-btn-gerar" onclick="executarGeracao()">Gerar com Gemini →</button>
+
+    <!-- RESULTADO -->
+    <div id="gen-resultado" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="section-title" id="gen-res-label">Conteúdo gerado</div>
+        <span style="font-size:10px;color:var(--taupe);padding:2px 8px;border-radius:50px;background:rgba(24,43,59,0.07);font-weight:600" id="gen-res-fmt">Carrossel</span>
+      </div>
+      <div id="gen-slides-wrap"></div>
+
+      <!-- LEGENDA -->
+      <div class="legenda-box" id="gen-legenda-box">
+        <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-dark);font-weight:600;margin-bottom:8px">Versão legenda</div>
+        <div class="legenda-text" id="gen-legenda-text"></div>
+        <button class="btn-outline" onclick="copiarLegenda()">Copiar legenda</button>
+      </div>
+
+      <div class="card" style="display:flex;flex-direction:column;gap:8px">
+        <div class="section-title">Próximos passos</div>
+        <button class="btn-outline" onclick="verLegendaGerador()">Ver como legenda</button>
+        <button class="btn-gold" onclick="salvarGerado()">Salvar na Produção → Publicar</button>
+        <button class="btn-primary" onclick="regerarConteudo()">Regenerar</button>
+        <button class="btn-outline">Salvar rascunho</button>
+      </div>
+    </div>
+
+  </div>
+  <div class="bottom-nav" id="nav-gerador"></div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ===== SUPABASE =====
+const SUPA_URL = 'https://azgrvkjtwywfxgsgkssi.supabase.co';
+const SUPA_KEY = 'sb_publishable_G1LmYZcGEAsmZtKqGK5cDQ_g3xzCK37';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+let currentUser = null;
+
+async function checkSession(){
+  const { data:{ session } } = await supa.auth.getSession();
+  if(session){ currentUser = session.user; goTo('dashboard'); }
+}
+
+async function loginEmail(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const senha = document.getElementById('loginSenha').value.trim();
+  if(!email||!senha){ showToast('Preencha e-mail e senha.'); return; }
+  const btn = document.querySelector('#formEntrar .btn-gold');
+  btn.textContent='Entrando...'; btn.disabled=true;
+  const { data, error } = await supa.auth.signInWithPassword({ email, password: senha });
+  btn.textContent='Entrar no Studio →'; btn.disabled=false;
+  if(error){ showToast('E-mail ou senha incorretos.'); return; }
+  currentUser = data.user;
+  goTo('dashboard');
+}
+
+async function cadastrarEmail(){
+  const nome = document.getElementById('cadNome').value.trim();
+  const email = document.getElementById('cadEmail').value.trim();
+  const senha = document.getElementById('cadSenha').value.trim();
+  if(!nome||!email||!senha){ showToast('Preencha todos os campos.'); return; }
+  if(senha.length<8){ showToast('Senha precisa ter pelo menos 8 caracteres.'); return; }
+  const btn = document.querySelector('#formCriar .btn-gold');
+  btn.textContent='Criando...'; btn.disabled=true;
+  const { data, error } = await supa.auth.signUp({ email, password: senha, options:{ data:{ name: nome } } });
+  btn.textContent='Criar minha conta →'; btn.disabled=false;
+  if(error){ showToast(error.message); return; }
+  currentUser = data.user;
+  await supa.from('profiles').upsert({ id: data.user.id, name: nome });
+  goTo('dashboard');
+}
+
+async function logout(){
+  await supa.auth.signOut();
+  currentUser = null;
+  goTo('login');
+}
+
+function showToast(msg){
+  let el = document.getElementById('toast-mdp');
+  if(!el){
+    el = document.createElement('div');
+    el.id='toast-mdp';
+    el.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--navy);color:var(--gold);padding:10px 20px;border-radius:50px;font-size:12px;font-weight:600;z-index:9999;max-width:300px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+    document.body.appendChild(el);
+  }
+  el.textContent=msg; el.style.display='block';
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.style.display='none',3000);
+}
+
+
+
+// ===== GEMINI API =====
+const GEMINI_KEY = 'AIzaSyBHyjS83QRbN4Z-YwzzqOKj9pW8B7azLCk';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+
+async function geminiGerar(prompt, contexto=''){
+  const fullPrompt = contexto ? contexto + '\n\n' + prompt : prompt;
+  try {
+    const res = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: fullPrompt }] }],
+        generationConfig: { temperature: 0.85, maxOutputTokens: 2048 }
+      })
+    });
+    const data = await res.json();
+    if(data.candidates && data.candidates[0]){
+      return data.candidates[0].content.parts[0].text;
+    }
+    return null;
+  } catch(e) {
+    console.error('Gemini error:', e);
+    return null;
+  }
+}
+
+// Contexto base do Segundo Cérebro (lido do Supabase quando disponível)
+let segundoCerebro = {
+  nome: 'Vivi Freri',
+  nicho: 'Presença digital e autoridade para mulheres 40+',
+  persona: 'Helena — mulher 40+, trajetória corporativa sólida, sente-se invisível no digital, tem muito a oferecer mas trava na hora de criar conteúdo',
+  produto: 'MDP — Método Digital na Prática, programa de 12 semanas',
+  voz: 'Direta, sem enrolação, coloca o dedo na dor, orienta com autoridade sem condescendência',
+  pilares: 'Identidade digital, Autoridade organizada, Presença estratégica',
+  posicionamento: 'Autoridade não se inventa. Se organiza.',
+  metodologia: 'BASE → FOCO → VOZ — organizar identidade antes de criar conteúdo'
+};
+
+function getContextoCerebro(){
+  return `Você é uma assistente de criação de conteúdo para ${segundoCerebro.nome}.
+SOBRE ELA: ${segundoCerebro.nicho}
+PERSONA: ${segundoCerebro.persona}
+PRODUTO: ${segundoCerebro.produto}
+VOZ E TOM: ${segundoCerebro.voz}
+PILARES: ${segundoCerebro.pilares}
+POSICIONAMENTO: ${segundoCerebro.posicionamento}
+METODOLOGIA: ${segundoCerebro.metodologia}
+
+INSTRUÇÕES: Crie conteúdo no estilo e voz dela. Direto, sem enrolação, com autoridade. Linguagem natural, sem clichês de marketing. Responda APENAS com o conteúdo solicitado, sem explicações adicionais.`;
+}
+
+// Gerar post completo com Gemini
+async function gerarComGemini(tipo, formato, tema=''){
+  const ctx = getContextoCerebro();
+  
+  const prompts = {
+    'bio': `Crie 3 versões de bio para Instagram para ${segundoCerebro.nome}. 
+Cada bio deve ter no máximo 150 caracteres, falar quem ela ajuda, o que resolve e ter um CTA.
+Formato de resposta:
+BIO 1: [texto]
+BIO 2: [texto]  
+BIO 3: [texto]`,
+
+    'carrossel_autoridade': `Crie um carrossel de 10 slides de autoridade sobre "${tema || 'identidade digital para mulheres 40+'}" no estilo de ${segundoCerebro.nome}.
+Para cada slide escreva:
+SLIDE [N] — [TIPO]:
+[Texto do slide]
+---`,
+
+    'reels_autoridade': `Crie um roteiro de Reels de autoridade de até 60 segundos sobre "${tema || 'invisibilidade digital'}" para ${segundoCerebro.nome}.
+Estruture em blocos:
+GANCHO (0-3s): [texto]
+CONTEXTO (3-15s): [texto]
+VISÃO (15-40s): [texto]
+FECHAMENTO (40-55s): [texto]
+CTA: [texto]`,
+
+    'passo_a_passo': `Crie um carrossel de 10 slides de passo a passo sobre "${tema || 'como organizar identidade digital'}" para ${segundoCerebro.nome}.
+Para cada slide:
+SLIDE [N] — [TIPO]:
+[Texto do slide]
+---`,
+
+    'conexao': `Crie um post de conexão no formato ${formato} para ${segundoCerebro.nome}.
+${formato === 'Carrossel' ? 'Crie 10 slides' : formato === 'Reels' ? 'Crie um roteiro de 60s' : 'Crie headline + legenda emocional'}.
+A história deve ser sobre uma experiência superada que conecta com a dor da persona.
+Para cada bloco:
+[N] — [TIPO]: [texto]
+---`,
+
+    'hype': `Crie um post hype sobre "${tema}" no formato ${formato} para ${segundoCerebro.nome}.
+Conecte o assunto em alta com a dor da persona. Mostre a visão dela sobre o tema.
+Para cada bloco:
+[N] — [TIPO]: [texto]
+---`,
+
+    'storytelling': `Transforme essa experiência em storytelling estratégico para ${segundoCerebro.nome}:
+TEMA: ${tema}
+Crie ${formato === 'Carrossel' ? '7 slides' : 'roteiro de Reels de 90s'} com a estrutura: Gancho → Contexto → Conflito → Virada → Reflexão → Conexão com método → CTA.
+Para cada bloco:
+[N] — [TIPO]: [texto]
+---`,
+
+    'checklist': `Crie um carrossel de checklist de 10 slides sobre "${tema || 'o que revisar antes de criar conteúdo digital'}" para ${segundoCerebro.nome}.
+A lista deve ter pelo menos 7 pontos de valor real, não óbvios.
+SLIDE [N] — [TIPO]: [texto]
+---`,
+
+    'produto': `Crie um carrossel de 10 slides para divulgar o produto "${segundoCerebro.produto}" de ${segundoCerebro.nome}.
+Foque na dor da persona, transformação e prova social. Tom: desejável, não panfletário.
+SLIDE [N] — [TIPO]: [texto]
+---`
+  };
+
+  const prompt = prompts[tipo] || `Crie conteúdo do tipo "${tipo}" no formato "${formato}" sobre "${tema}" para ${segundoCerebro.nome}.`;
+  
+  showToast('Gemini está gerando...');
+  const resultado = await geminiGerar(prompt, ctx);
+  return resultado;
+}
+
+// Parser de resposta do Gemini em slides
+function parseGeminiSlides(texto){
+  if(!texto) return [];
+  const blocos = texto.split('---').filter(b => b.trim());
+  return blocos.map(bloco => {
+    const linhas = bloco.trim().split('\n').filter(l => l.trim());
+    const primeiraLinha = linhas[0] || '';
+    // Tenta extrair tipo e label da primeira linha
+    const match = primeiraLinha.match(/^(?:SLIDE\s*)?(\d+)\s*[—\-]\s*(.+?):\s*(.*)$/i);
+    if(match){
+      return {
+        num: parseInt(match[1]),
+        label: match[2].trim(),
+        texto: (match[3] + '\n' + linhas.slice(1).join('\n')).trim()
+      };
+    }
+    return { num: 0, label: 'Bloco', texto: bloco.trim() };
+  }).filter(s => s.texto);
+}
+
+
+// ===== GERADOR COM GEMINI =====
+let geradorConfig = { tipo:'', formato:'', formatos:[] };
+let geradorSlides = [];
+
+const TAREFAS_CONFIG = {
+  't6_autoridade':   { titulo:'Carrossel de Autoridade', modulo:'Módulo 2 · T6', tipo:'carrossel_autoridade', formatos:['Carrossel','Reels'], temInput:true, inputLabel:'Tema da autoridade', inputHint:'Ex: sua transição de carreira, sua metodologia, um resultado que obteve...', aviso:true, avisoTitle:'Slide 1 e 2 são os mais importantes', avisoText:'O Instagram entrega o carrossel duas vezes — às vezes o slide 1, às vezes o slide 2. Os dois precisam parar o dedo.' },
+  't8_checklist':    { titulo:'Post Checklist', modulo:'Módulo 2 · T8', tipo:'checklist', formatos:['Carrossel','Reels'], temInput:true, inputLabel:'Tema do checklist', inputHint:'Ex: o que revisar antes de criar conteúdo, sinais de identidade digital travada...' },
+  't8_produto':      { titulo:'Post de Produto', modulo:'Módulo 2 · T8', tipo:'produto', formatos:['Carrossel'], temInput:false },
+  't9_passo':        { titulo:'Passo a Passo', modulo:'Módulo 2 · T9', tipo:'passo_a_passo', formatos:['Carrossel','Reels'], temInput:true, inputLabel:'O que você vai ensinar', inputHint:'Ex: como montar linha editorial, como escrever bio, como organizar identidade...' },
+  't9_reels':        { titulo:'Reels de Autoridade', modulo:'Módulo 2 · T9', tipo:'reels_autoridade', formatos:['Reels'], temInput:true, inputLabel:'Tema do Reels', inputHint:'Ex: invisibilidade digital, autoridade que ninguém vê, o erro que trava...' },
+  't10_conexao':     { titulo:'Post de Conexão', modulo:'Módulo 2 · T10', tipo:'conexao', formatos:['Estático','Carrossel','Reels'], temInput:true, inputLabel:'A história que quer contar', inputHint:'Ex: quando quase desisti, quando me senti invisível, quando tudo mudou...' },
+  't10_hype':        { titulo:'Post Hype', modulo:'Módulo 2 · T10', tipo:'hype', formatos:['Carrossel','Reels','Vídeo direto'], temInput:true, inputLabel:'Assunto em alta que quer usar', inputHint:'Ex: série que estreou, frase viral, tendência do mercado...' },
+  't12_story':       { titulo:'Storytelling Estratégico', modulo:'Módulo 2 · T12', tipo:'storytelling', formatos:['Carrossel','Reels'], temInput:true, inputLabel:'A experiência que quer transformar em história', inputHint:'Descreva a situação, o conflito, a virada e a lição...' },
+};
+
+function abrirGerador(tarefaKey){
+  const cfg = TAREFAS_CONFIG[tarefaKey];
+  if(!cfg){ showToast('Tarefa não encontrada.'); return; }
+  
+  geradorConfig = { ...cfg, formato: cfg.formatos[0] };
+  
+  // Header
+  document.getElementById('gen-modulo').textContent = cfg.modulo;
+  document.getElementById('gen-titulo').textContent = cfg.titulo;
+  
+  // Tags do Segundo Cérebro
+  const tags = document.getElementById('gen-cerebro-tags');
+  tags.innerHTML = '';
+  ['Segundo Cérebro ativo', segundoCerebro.nicho.split(' ').slice(0,3).join(' '), 'Tom: '+segundoCerebro.voz.split(',')[0]].forEach(t=>{
+    tags.innerHTML += `<span style="font-size:10px;padding:2px 9px;border-radius:50px;background:rgba(212,190,142,0.1);color:var(--gold);font-weight:500">${t}</span>`;
+  });
+  
+  // Input de tema
+  const temaWrap = document.getElementById('gen-tema-wrap');
+  temaWrap.style.display = cfg.temInput ? 'block' : 'none';
+  if(cfg.temInput){
+    document.getElementById('gen-tema-label').textContent = cfg.inputLabel || 'Tema';
+    document.getElementById('gen-tema-hint').textContent = cfg.inputHint || '';
+    document.getElementById('gen-tema-input').value = '';
+  }
+  
+  // Formatos
+  const fmtGrid = document.getElementById('gen-fmt-grid');
+  fmtGrid.innerHTML = '';
+  const fmtIcons = {'Carrossel':'🎠','Reels':'🎬','Estático':'🖼️','Vídeo direto':'📹','Stories':'📱'};
+  cfg.formatos.forEach((f,i)=>{
+    const div = document.createElement('div');
+    div.className = 'fmt-opt' + (i===0?' on':'');
+    div.onclick = ()=>{ 
+      document.querySelectorAll('#gen-fmt-grid .fmt-opt').forEach(x=>x.classList.remove('on'));
+      div.classList.add('on');
+      geradorConfig.formato = f;
+    };
+    div.innerHTML = `<div class="fmt-icon">${fmtIcons[f]||'📄'}</div><div class="fmt-name">${f}</div>`;
+    fmtGrid.appendChild(div);
+  });
+  
+  // Aviso
+  const aviso = document.getElementById('gen-aviso');
+  if(cfg.aviso){
+    aviso.style.display='block';
+    document.getElementById('gen-aviso-title').textContent = cfg.avisoTitle||'';
+    document.getElementById('gen-aviso-text').textContent = cfg.avisoText||'';
+  } else {
+    aviso.style.display='none';
+  }
+  
+  // Reset resultado
+  document.getElementById('gen-resultado').style.display='none';
+  document.getElementById('gen-legenda-box').classList.remove('show');
+  document.getElementById('gen-btn-gerar').style.display='block';
+  document.getElementById('gen-btn-gerar').textContent = 'Gerar com Gemini →';
+  document.getElementById('gen-btn-gerar').disabled = false;
+  
+  goTo('gerador');
+}
+
+async function executarGeracao(){
+  const btn = document.getElementById('gen-btn-gerar');
+  const tema = document.getElementById('gen-tema-input').value.trim();
+  
+  btn.textContent = 'Gemini está gerando...';
+  btn.disabled = true;
+  
+  // Shimmer
+  const slidesWrap = document.getElementById('gen-slides-wrap');
+  slidesWrap.innerHTML = '<div class="shimmer" style="height:80px;margin-bottom:8px"></div><div class="shimmer" style="height:80px;margin-bottom:8px"></div><div class="shimmer" style="height:80px"></div>';
+  document.getElementById('gen-resultado').style.display='block';
+  document.getElementById('gen-res-fmt').textContent = geradorConfig.formato;
+  document.getElementById('gen-res-label').textContent = 'Gerando com Gemini...';
+  
+  const resultado = await gerarComGemini(geradorConfig.tipo, geradorConfig.formato, tema);
+  
+  if(!resultado){
+    showToast('Erro ao gerar. Tente novamente.');
+    btn.textContent = 'Gerar com Gemini →';
+    btn.disabled = false;
+    slidesWrap.innerHTML = '';
+    return;
+  }
+  
+  geradorSlides = parseGeminiSlides(resultado);
+  renderGeradorSlides(geradorSlides);
+  
+  document.getElementById('gen-res-label').textContent = geradorConfig.formato === 'Reels' ? 'Roteiro gerado — edite cada bloco' : 'Slides gerados — edite clicando';
+  btn.style.display='none';
+  showToast('✓ Conteúdo gerado!');
+}
+
+function renderGeradorSlides(slides){
+  const wrap = document.getElementById('gen-slides-wrap');
+  wrap.innerHTML = '';
+  if(!slides.length){
+    wrap.innerHTML='<div class="empty"><div class="empty-icon">✦</div><div class="empty-txt">Nenhum slide foi gerado. Tente regenerar.</div></div>';
+    return;
+  }
+  slides.forEach((s,i)=>{
+    const card = document.createElement('div');
+    card.className='slide-card';
+    card.id='gslide-'+i;
+    card.innerHTML=`
+      <div class="slide-top">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="slide-num">${i+1}</div>
+          <span class="tag tag-gold">${s.label||'Slide'}</span>
+        </div>
+        <button class="btn-sm" onclick="toggleGSlide(${i})">Editar</button>
+      </div>
+      <div class="slide-body" id="gst-${i}">${s.texto}</div>
+      <textarea class="slide-ta" id="gta-${i}" rows="4" oninput="updateGSlide(${i})">${s.texto}</textarea>
+      <div class="slide-actions">
+        <button class="btn-sm" onclick="melhorarSlide(${i})">Melhorar</button>
+        <button class="btn-sm" onclick="maisImpacto(${i})">+ Impacto</button>
+        <button class="btn-sm" onclick="simplificarSlide(${i})">Simplificar</button>
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+function toggleGSlide(i){
+  const card=document.getElementById('gslide-'+i);
+  const st=document.getElementById('gst-'+i);
+  const ta=document.getElementById('gta-'+i);
+  const btn=card.querySelector('.btn-sm');
+  const isEd=card.classList.contains('editing');
+  if(isEd){st.style.display='block';ta.style.display='none';card.classList.remove('editing');btn.textContent='Editar';}
+  else{st.style.display='none';ta.style.display='block';ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';card.classList.add('editing');btn.textContent='Salvar';ta.focus();}
+}
+
+function updateGSlide(i){
+  const ta=document.getElementById('gta-'+i);
+  const st=document.getElementById('gst-'+i);
+  geradorSlides[i].texto=ta.value;
+  st.textContent=ta.value;
+  ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';
+}
+
+async function melhorarSlide(i){
+  showToast('Melhorando slide '+( i+1)+'...');
+  const ctx = getContextoCerebro();
+  const res = await geminiGerar(`Melhore este texto mantendo a voz e estilo da autora. Retorne APENAS o texto melhorado, sem explicações:\n\n${geradorSlides[i].texto}`, ctx);
+  if(res){ geradorSlides[i].texto=res.trim(); document.getElementById('gst-'+i).textContent=res.trim(); document.getElementById('gta-'+i).value=res.trim(); }
+}
+
+async function maisImpacto(i){
+  showToast('Tornando mais impactante...');
+  const ctx = getContextoCerebro();
+  const res = await geminiGerar(`Reescreva com mais impacto e provocação, mantendo a voz da autora. Retorne APENAS o texto, sem explicações:\n\n${geradorSlides[i].texto}`, ctx);
+  if(res){ geradorSlides[i].texto=res.trim(); document.getElementById('gst-'+i).textContent=res.trim(); document.getElementById('gta-'+i).value=res.trim(); }
+}
+
+async function simplificarSlide(i){
+  showToast('Simplificando...');
+  const ctx = getContextoCerebro();
+  const res = await geminiGerar(`Simplifique mantendo a essência e a voz da autora. Retorne APENAS o texto, sem explicações:\n\n${geradorSlides[i].texto}`, ctx);
+  if(res){ geradorSlides[i].texto=res.trim(); document.getElementById('gst-'+i).textContent=res.trim(); document.getElementById('gta-'+i).value=res.trim(); }
+}
+
+function verLegendaGerador(){
+  const texto = geradorSlides.map(s=>s.texto).join('\n\n');
+  document.getElementById('gen-legenda-text').textContent=texto;
+  document.getElementById('gen-legenda-box').classList.add('show');
+}
+
+function copiarLegenda(){
+  const texto=document.getElementById('gen-legenda-text').textContent;
+  navigator.clipboard.writeText(texto).then(()=>showToast('✓ Legenda copiada!'));
+}
+
+async function salvarGerado(){
+  if(!currentUser){ showToast('Faça login para salvar.'); return; }
+  const titulo = geradorConfig.titulo + (document.getElementById('gen-tema-input').value?' — '+document.getElementById('gen-tema-input').value:'');
+  const bodyText = geradorSlides.map(s=>s.texto).join('\n\n---\n\n');
+  const { error } = await supa.from('content_pieces').insert({
+    user_id: currentUser.id,
+    title: titulo,
+    body_text: bodyText,
+    format: geradorConfig.formato,
+    pilar: 'Autoridade',
+    task_ref: geradorConfig.tipo,
+    kanban_status: 'pronto'
+  });
+  if(error){ showToast('Erro ao salvar.'); return; }
+  showToast('✓ Salvo na Produção!');
+}
+
+async function regerarConteudo(){
+  document.getElementById('gen-resultado').style.display='none';
+  document.getElementById('gen-btn-gerar').style.display='block';
+  document.getElementById('gen-btn-gerar').textContent='Regenerar com Gemini →';
+  document.getElementById('gen-btn-gerar').disabled=false;
+  document.getElementById('gen-legenda-box').classList.remove('show');
+}
+
+function buildGeradorNav(){
+  const navEl = document.getElementById('nav-gerador');
+  if(!navEl) return;
+  NAV_ITEMS.forEach(n=>{
+    const btn = document.createElement('button');
+    btn.className='nav-btn';
+    btn.onclick=()=>goTo(n.id);
+    const shape = n.icon==='sq'?'<div class="nav-sq"></div>':'<div class="nav-dot"></div>';
+    btn.innerHTML=`<div class="nav-icon">${shape}</div><div class="nav-label">${n.label}</div>`;
+    navEl.appendChild(btn);
+  });
+}
+
+// ===== NAVEGAÇÃO =====
+const NAV_ITEMS = [
+  {id:'dashboard', icon:'dot', label:'Início'},
+  {id:'trilha',    icon:'sq',  label:'Trilha'},
+  {id:'producao',  icon:'sq',  label:'Produção'},
+  {id:'biblioteca',icon:'dot', label:'Biblioteca'},
+  {id:'hoje',      icon:'dot', label:'Hoje'},
+];
+
+function buildNavs(){
+  NAV_ITEMS.forEach(item=>{
+    const navEl = document.getElementById('nav-'+item.id);
+    if(!navEl) return;
+    NAV_ITEMS.forEach(n=>{
+      const btn = document.createElement('button');
+      btn.className='nav-btn';
+      btn.onclick=()=>goTo(n.id);
+      const iconClass = n.id===item.id?'nav-icon active':'nav-icon';
+      const lblClass = n.id===item.id?'nav-label active':'nav-label';
+      const shape = n.icon==='sq'?'<div class="nav-sq"></div>':'<div class="nav-dot"></div>';
+      btn.innerHTML=`<div class="${iconClass}">${shape}</div><div class="${lblClass}">${n.label}</div>`;
+      navEl.appendChild(btn);
+    });
+  });
+}
+
+function goTo(screen){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById('screen-'+screen);
+  if(el){
+    el.classList.add('active');
+    el.scrollTop=0;
+  }
+}
+
+// ===== LOGIN TABS =====
+function showLoginTab(tab){
+  document.getElementById('tabEntrar').classList.toggle('on', tab==='entrar');
+  document.getElementById('tabCriar').classList.toggle('on', tab==='criar');
+  document.getElementById('formEntrar').style.display = tab==='entrar'?'block':'none';
+  document.getElementById('formCriar').style.display = tab==='criar'?'block':'none';
+}
+
+// ===== MÓDULOS TOGGLE =====
+function toggleMod(header){
+  const tasks = header.nextElementSibling;
+  if(tasks) tasks.classList.toggle('open');
+}
+
+// ===== BIBLIOTECA =====
+const bibConteudos = [
+  {titulo:'Carrossel de Autoridade — Jornada do Herói',fmt:'Carrossel',status:'publicado',pilar:'Autoridade',data:'15/03'},
+  {titulo:'Quem é você — Apresentação com personalidade',fmt:'Carrossel',status:'publicado',pilar:'Identidade',data:'17/03'},
+  {titulo:'Post de Posicionamento',fmt:'Carrossel',status:'pronto',pilar:'Autoridade',data:'19/03'},
+  {titulo:'Como eu consegui — Trajetória com resultado',fmt:'Carrossel',status:'pronto',pilar:'Autoridade',data:'20/03'},
+  {titulo:'Checklist — 10 sinais de identidade digital travada',fmt:'Carrossel',status:'publicado',pilar:'Público',data:'21/03'},
+  {titulo:'Post de Produto — MDP Turma 2',fmt:'Carrossel',status:'pronto',pilar:'Produto',data:'22/03'},
+  {titulo:'Passo a passo — 7 passos para organizar identidade',fmt:'Carrossel',status:'publicado',pilar:'Método',data:'23/03'},
+  {titulo:'Reels de Autoridade — Invisibilidade disfarçada',fmt:'Reels',status:'publicado',pilar:'Autoridade',data:'24/03'},
+  {titulo:'Post de Conexão — Ela quase desistiu',fmt:'Estático',status:'pronto',pilar:'Conexão',data:'25/03'},
+  {titulo:'Storytelling — A reunião que mudou tudo',fmt:'Carrossel',status:'publicado',pilar:'Autoridade',data:'28/03'},
+  {titulo:'Stories com Analogias — A gaveta cheia',fmt:'Stories',status:'gerado',pilar:'Conexão',data:'28/03'},
+  {titulo:'Bio Magnética — 3 versões prontas',fmt:'Estático',status:'pronto',pilar:'Identidade',data:'10/03'},
+];
+
+function buildBiblioteca(){
+  const lista = document.getElementById('bib-lista');
+  if(!lista) return;
+  const sColors={gerado:'rgba(24,43,59,0.08)',pronto:'rgba(212,190,142,0.15)',publicado:'rgba(24,43,59,0.1)'};
+  const sTexts={gerado:'var(--navy)',pronto:'var(--gold-dark)',publicado:'var(--navy)'};
+  const sLabels={gerado:'Gerado',pronto:'Aprovado',publicado:'Publicado'};
+  bibConteudos.forEach(c=>{
+    const card = document.createElement('div');
+    card.className='bib-card';
+    card.innerHTML=`
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:7px">
+        <div class="bib-title">${c.titulo}</div>
+        <span style="font-size:9px;padding:2px 8px;border-radius:50px;font-weight:600;background:${sColors[c.status]};color:${sTexts[c.status]};white-space:nowrap;flex-shrink:0">${sLabels[c.status]}</span>
+      </div>
+      <div class="bib-meta">
+        <span class="tag tag-navy">${c.fmt}</span>
+        <span class="tag tag-gold">${c.pilar}</span>
+        <span style="font-size:9px;color:var(--silver);margin-left:auto">${c.data}</span>
+      </div>
+      <div class="bib-acoes">
+        <button class="btn-sm" style="color:var(--gold-dark);border-color:rgba(212,190,142,0.3)">Ver</button>
+        <button class="btn-sm">Reutilizar</button>
+        <button class="btn-sm">Adaptar</button>
+      </div>
+    `;
+    lista.appendChild(card);
+  });
+}
+
+// ===== O QUE POSTAR HOJE =====
+const hojeIdeas = [
+  {num:1,titulo:'Por que você tem 30 anos de experiência e ainda sente que não tem nada a dizer online',angulo:'Amnésia Identitária Digital — alta identificação com sua persona agora.',fmt:'Reels',pilar:'Consciência',funil:'Topo'},
+  {num:2,titulo:'Você não precisa de mais seguidores para ter autoridade — precisa de clareza',angulo:'Quebra de mito. Aquece a audiência para a Turma 2.',fmt:'Carrossel',pilar:'Autoridade',funil:'Meio'},
+  {num:3,titulo:'Esta aluna chegou sem conseguir escrever a própria bio — o que mudou em 4 semanas',angulo:'Prova social com storytelling. Perfeito para aquecimento pré-venda.',fmt:'Carrossel',pilar:'Prova social',funil:'Fundo'},
+  {num:4,titulo:'5 stories sobre a sensação de ter muito pra dizer e não saber por onde começar',angulo:'Analogia do dia a dia. Ideal para dia sem post no feed.',fmt:'Stories',pilar:'Conexão',funil:'Topo'},
+  {num:5,titulo:'MDP Turma 2 — o que muda quando você para de criar no automático',angulo:'Post de produto com copy de desejo. Você está há 6 dias sem postar.',fmt:'Carrossel',pilar:'Produto',funil:'Venda'},
+];
+
+function gerarHoje(){
+  document.getElementById('hoje-gen').innerHTML='<div class="shimmer" style="height:80px;margin-bottom:8px"></div><div class="shimmer" style="height:80px;margin-bottom:8px"></div><div class="shimmer" style="height:80px"></div>';
+  setTimeout(()=>{
+    document.getElementById('hoje-gen').style.display='none';
+    const lista = document.getElementById('hoje-lista');
+    hojeIdeas.forEach(s=>{
+      const card = document.createElement('div');
+      card.className='sug-card';
+      card.innerHTML=`
+        <div class="sug-top">
+          <div class="sug-num">${s.num}</div>
+          <div>
+            <div class="sug-titulo">${s.titulo}</div>
+            <div class="sug-angulo">${s.angulo}</div>
+          </div>
+        </div>
+        <div class="sug-meta">
+          <span class="tag tag-navy">${s.fmt}</span>
+          <span class="tag tag-gold">${s.pilar}</span>
+          <span class="tag tag-taupe">${s.funil} de funil</span>
+        </div>
+        <button class="btn-primary" style="margin-top:10px;margin-bottom:0">Criar esse conteúdo →</button>
+      `;
+      lista.appendChild(card);
+    });
+    document.getElementById('hoje-sugestoes').style.display='block';
+  }, 2000);
+}
+
+// ===== INIT =====
+buildNavs();
+buildBiblioteca();
+checkSession();
+buildGeradorNav();
+</script>
+</body>
+</html>
